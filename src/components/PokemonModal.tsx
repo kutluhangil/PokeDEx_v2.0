@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles } from "lucide-react";
+import { X, Sparkles, Share2 } from "lucide-react";
+import { toast } from "sonner";
 import { usePokemonDetail } from "@/hooks/usePokemon";
 import { getTypeColor, getTypeGradient } from "@/lib/pokemon";
 import { useSettings } from "@/contexts/SettingsContext";
