@@ -58,6 +58,37 @@
     --sidebar-border: 240 5% 18%;
     --sidebar-ring: 4 100% 60%;
   }
+
+  /* Ultra Retro Mode — monochrome GameBoy-inspired green */
+  [data-theme="ultra-retro"] {
+    --background: 95 30% 8%;
+    --foreground: 88 90% 75%;
+    --card: 95 30% 12%;
+    --card-foreground: 88 90% 75%;
+    --popover: 95 30% 10%;
+    --popover-foreground: 88 90% 75%;
+    --primary: 88 90% 55%;
+    --primary-foreground: 95 30% 8%;
+    --secondary: 70 80% 55%;
+    --secondary-foreground: 95 30% 8%;
+    --muted: 95 25% 18%;
+    --muted-foreground: 88 50% 55%;
+    --accent: 88 90% 55%;
+    --accent-foreground: 95 30% 8%;
+    --border: 88 40% 25%;
+    --input: 88 40% 25%;
+    --ring: 88 90% 55%;
+    --surface-glass: 95 30% 14%;
+
+    --glow-red: 0 0 20px hsl(88 90% 55% / 0.5), 0 0 50px hsl(88 90% 55% / 0.3);
+    --glow-cyan: 0 0 20px hsl(88 90% 55% / 0.5), 0 0 50px hsl(88 90% 55% / 0.3);
+    --glow-yellow: 0 0 20px hsl(70 80% 55% / 0.5), 0 0 50px hsl(70 80% 55% / 0.3);
+    --glow-green: 0 0 20px hsl(88 90% 55% / 0.5), 0 0 50px hsl(88 90% 55% / 0.3);
+  }
+
+  [data-theme="ultra-retro"] body {
+    image-rendering: pixelated;
+  }
 }
 
 @layer base {
