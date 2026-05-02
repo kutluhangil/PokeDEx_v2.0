@@ -6,6 +6,8 @@ import SearchSection from "@/components/SearchSection";
 import CollectionGrid from "@/components/CollectionGrid";
 import PokemonModal from "@/components/PokemonModal";
 import PixelParticles from "@/components/PixelParticles";
+import SettingsBar from "@/components/SettingsBar";
+import Leaderboard from "@/components/Leaderboard";
 
 const Index = () => {
   const [introComplete, setIntroComplete] = useState(false);
@@ -15,6 +17,12 @@ const Index = () => {
   const handleIntroComplete = useCallback(() => {
     setIntroComplete(true);
   }, []);
+
+  const handleRandom = useCallback(() => {
+    if (pokemon.length === 0) return;
+    const random = pokemon[Math.floor(Math.random() * pokemon.length)];
+    setSelectedPokemonId(random.id);
+  }, [pokemon]);
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -30,13 +38,16 @@ const Index = () => {
         <main className="relative z-10">
           {/* Header */}
           <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">
-            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-              <h1 className="font-pixel text-sm text-primary text-glow-red">
-                POKEDEX
-              </h1>
-              <span className="font-pixel text-[8px] text-muted-foreground">
-                {pokemon.length} POKÉMON
-              </span>
+            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <h1 className="font-pixel text-sm text-primary text-glow-red">
+                  POKEDEX
+                </h1>
+                <span className="font-pixel text-[8px] text-muted-foreground hidden md:inline">
+                  {pokemon.length} POKÉMON
+                </span>
+              </div>
+              <SettingsBar onRandom={handleRandom} />
             </div>
           </header>
 
@@ -48,6 +59,7 @@ const Index = () => {
           ) : (
             <>
               <HeroCarousel pokemon={pokemon} onSelect={setSelectedPokemonId} />
+              <Leaderboard pokemon={pokemon} onSelect={setSelectedPokemonId} />
               <SearchSection pokemon={pokemon} onSelect={setSelectedPokemonId} />
               <CollectionGrid pokemon={pokemon} onSelect={setSelectedPokemonId} />
             </>
@@ -66,6 +78,7 @@ const Index = () => {
       <PokemonModal
         pokemonId={selectedPokemonId}
         onClose={() => setSelectedPokemonId(null)}
+        onNavigate={setSelectedPokemonId}
       />
     </div>
   );
