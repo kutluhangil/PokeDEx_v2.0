@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAllPokemon } from "@/hooks/usePokemon";
 import IntroAnimation from "@/components/IntroAnimation";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -10,19 +11,38 @@ import SettingsBar from "@/components/SettingsBar";
 import Leaderboard from "@/components/Leaderboard";
 
 const Index = () => {
-  const [introComplete, setIntroComplete] = useState(false);
-  const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const selectedPokemonId = id ? parseInt(id, 10) || null : null;
+
   const { data: pokemon = [], isLoading } = useAllPokemon();
+  // Skip intro if user is landing on a deep link
+  const [introComplete, setIntroComplete] = useState(!!selectedPokemonId);
+
+  useEffect(() => {
+    if (selectedPokemonId && !introComplete) setIntroComplete(true);
+  }, [selectedPokemonId, introComplete]);
 
   const handleIntroComplete = useCallback(() => {
     setIntroComplete(true);
   }, []);
 
+  const openPokemon = useCallback(
+    (pid: number) => {
+      navigate(`/pokemon/${pid}`);
+    },
+    [navigate]
+  );
+
+  const closePokemon = useCallback(() => {
+    navigate("/");
+  }, [navigate]);
+
   const handleRandom = useCallback(() => {
     if (pokemon.length === 0) return;
     const random = pokemon[Math.floor(Math.random() * pokemon.length)];
-    setSelectedPokemonId(random.id);
-  }, [pokemon]);
+    openPokemon(random.id);
+  }, [pokemon, openPokemon]);
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -40,7 +60,10 @@ const Index = () => {
           <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">
             <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                <h1 className="font-pixel text-sm text-primary text-glow-red">
+                <h1
+                  className="font-pixel text-sm text-primary text-glow-red cursor-pointer"
+                  onClick={() => navigate("/")}
+                >
                   POKEDEX
                 </h1>
                 <span className="font-pixel text-[8px] text-muted-foreground hidden md:inline">
@@ -58,10 +81,10 @@ const Index = () => {
             </div>
           ) : (
             <>
-              <HeroCarousel pokemon={pokemon} onSelect={setSelectedPokemonId} />
-              <Leaderboard pokemon={pokemon} onSelect={setSelectedPokemonId} />
-              <SearchSection pokemon={pokemon} onSelect={setSelectedPokemonId} />
-              <CollectionGrid pokemon={pokemon} onSelect={setSelectedPokemonId} />
+              <HeroCarousel pokemon={pokemon} onSelect={openPokemon} />
+              <Leaderboard pokemon={pokemon} onSelect={openPokemon} />
+              <SearchSection pokemon={pokemon} onSelect={openPokemon} />
+              <CollectionGrid pokemon={pokemon} onSelect={openPokemon} />
             </>
           )}
 
@@ -77,8 +100,8 @@ const Index = () => {
       {/* Modal */}
       <PokemonModal
         pokemonId={selectedPokemonId}
-        onClose={() => setSelectedPokemonId(null)}
-        onNavigate={setSelectedPokemonId}
+        onClose={closePokemon}
+        onNavigate={openPokemon}
       />
     </div>
   );
