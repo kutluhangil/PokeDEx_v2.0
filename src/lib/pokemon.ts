@@ -2,8 +2,11 @@ export interface PokemonBasic {
   id: number;
   name: string;
   sprite: string;
+  shinySprite: string;
   animatedSprite: string;
+  shinyAnimatedSprite: string;
   officialArtwork: string;
+  shinyOfficialArtwork: string;
   types: string[];
   generation: number;
   isLegendary: boolean;
@@ -95,12 +98,19 @@ export async function fetchPokemonList(limit = 151, offset = 0): Promise<Pokemon
           id: data.id,
           name: data.name,
           sprite: data.sprites.front_default || "",
+          shinySprite: data.sprites.front_shiny || data.sprites.front_default || "",
           animatedSprite:
             data.sprites.versions?.["generation-v"]?.["black-white"]?.animated?.front_default ||
             data.sprites.front_default || "",
+          shinyAnimatedSprite:
+            data.sprites.versions?.["generation-v"]?.["black-white"]?.animated?.front_shiny ||
+            data.sprites.front_shiny || data.sprites.front_default || "",
           officialArtwork:
             data.sprites.other?.["official-artwork"]?.front_default ||
             data.sprites.front_default || "",
+          shinyOfficialArtwork:
+            data.sprites.other?.["official-artwork"]?.front_shiny ||
+            data.sprites.front_shiny || data.sprites.front_default || "",
           types: data.types.map((t: any) => t.type.name),
           generation: getGeneration(data.id),
           isLegendary: speciesData.is_legendary,
@@ -158,12 +168,19 @@ export async function fetchPokemonDetail(id: number): Promise<PokemonDetail> {
     id: data.id,
     name: data.name,
     sprite: data.sprites.front_default || "",
+    shinySprite: data.sprites.front_shiny || data.sprites.front_default || "",
     animatedSprite:
       data.sprites.versions?.["generation-v"]?.["black-white"]?.animated?.front_default ||
       data.sprites.front_default || "",
+    shinyAnimatedSprite:
+      data.sprites.versions?.["generation-v"]?.["black-white"]?.animated?.front_shiny ||
+      data.sprites.front_shiny || data.sprites.front_default || "",
     officialArtwork:
       data.sprites.other?.["official-artwork"]?.front_default ||
       data.sprites.front_default || "",
+    shinyOfficialArtwork:
+      data.sprites.other?.["official-artwork"]?.front_shiny ||
+      data.sprites.front_shiny || data.sprites.front_default || "",
     types: data.types.map((t: any) => t.type.name),
     generation: getGeneration(data.id),
     isLegendary: speciesData.is_legendary,
