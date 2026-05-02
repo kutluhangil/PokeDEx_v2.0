@@ -1,11 +1,15 @@
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { usePokemonDetail } from "@/hooks/usePokemon";
 import { getTypeColor, getTypeGradient } from "@/lib/pokemon";
+import { useSettings } from "@/contexts/SettingsContext";
+import { trackView } from "@/lib/viewTracker";
 
 interface PokemonModalProps {
   pokemonId: number | null;
   onClose: () => void;
+  onNavigate?: (id: number) => void;
 }
 
 const STAT_LABELS: Record<string, string> = {
