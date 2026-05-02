@@ -21,8 +21,13 @@ const STAT_LABELS: Record<string, string> = {
   speed: "SPD",
 };
 
-const PokemonModal = ({ pokemonId, onClose }: PokemonModalProps) => {
+const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => {
   const { data: pokemon, isLoading } = usePokemonDetail(pokemonId);
+  const { shiny } = useSettings();
+
+  useEffect(() => {
+    if (pokemonId) trackView(pokemonId);
+  }, [pokemonId]);
 
   return (
     <AnimatePresence>
