@@ -65,13 +65,44 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                   style={{ background: getTypeGradient(pokemon.types) }}
                 />
 
-                {/* Close button */}
-                <button
-                  onClick={onClose}
-                  className="absolute top-4 right-4 z-20 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                {/* Action buttons */}
+                <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+                  <button
+                    onClick={async () => {
+                      const url = `${window.location.origin}/pokemon/${pokemon.id}`;
+                      try {
+                        if (navigator.share) {
+                          await navigator.share({
+                            title: `Pokédex — ${pokemon.name}`,
+                            text: `Check out ${pokemon.name} on Pokédex!`,
+                            url,
+                          });
+                        } else {
+                          await navigator.clipboard.writeText(url);
+                          toast.success("Link copied to clipboard!");
+                        }
+                      } catch {
+                        try {
+                          await navigator.clipboard.writeText(url);
+                          toast.success("Link copied to clipboard!");
+                        } catch {
+                          toast.error("Could not copy link");
+                        }
+                      }
+                    }}
+                    title="Share link"
+                    className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={onClose}
+                    title="Close"
+                    className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
 
                 <div className="relative z-10 p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                   {/* Left - Image */}
