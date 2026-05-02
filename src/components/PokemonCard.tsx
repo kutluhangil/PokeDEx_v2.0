@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 import { type PokemonBasic, getTypeColor, getTypeGradient } from "@/lib/pokemon";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface PokemonCardProps {
   pokemon: PokemonBasic;
@@ -32,9 +34,15 @@ const PokemonCard = ({ pokemon, onClick, variant = "grid", index = 0 }: PokemonC
     setIsHovered(false);
   };
 
+  const { shiny } = useSettings();
   const isHero = variant === "hero";
   const primaryType = pokemon.types[0];
   const typeColor = getTypeColor(primaryType);
+
+  const heroImg = shiny ? pokemon.shinyOfficialArtwork : pokemon.officialArtwork;
+  const gridImg = shiny
+    ? pokemon.shinyAnimatedSprite || pokemon.shinySprite
+    : pokemon.animatedSprite || pokemon.sprite;
 
   return (
     <motion.div
@@ -88,18 +96,27 @@ const PokemonCard = ({ pokemon, onClick, variant = "grid", index = 0 }: PokemonC
 
           {/* Sprite */}
           <motion.img
-            src={isHero ? pokemon.officialArtwork : pokemon.animatedSprite || pokemon.sprite}
+            src={isHero ? heroImg : gridImg}
             alt={pokemon.name}
-            className={`${isHero ? "w-48 h-48" : "w-24 h-24"} object-contain drop-shadow-lg`}
+            className={`${isHero ? "w-48 h-48" : "w-24 h-24"} object-contain drop-shadow-lg ${shiny ? "saturate-150" : ""}`}
             style={{
               imageRendering: isHero ? "auto" : "pixelated",
               filter: isHovered
-                ? `drop-shadow(0 0 15px hsl(${typeColor} / 0.6))`
+                ? `drop-shadow(0 0 15px hsl(${shiny ? "47 100% 55%" : typeColor} / 0.7))`
+                : shiny
+                ? `drop-shadow(0 0 8px hsl(47 100% 55% / 0.5))`
                 : "none",
             }}
             animate={isHovered ? { y: -5 } : { y: 0 }}
             loading="lazy"
           />
+
+          {shiny && (
+            <Sparkles
+              className="absolute top-3 right-3 w-4 h-4 text-secondary animate-pulse"
+              style={{ filter: "drop-shadow(0 0 6px hsl(47 100% 55%))" }}
+            />
+          )}
 
           {/* Name */}
           <h3
