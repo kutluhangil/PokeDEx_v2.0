@@ -1,11 +1,15 @@
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { usePokemonDetail } from "@/hooks/usePokemon";
 import { getTypeColor, getTypeGradient } from "@/lib/pokemon";
+import { useSettings } from "@/contexts/SettingsContext";
+import { trackView } from "@/lib/viewTracker";
 
 interface PokemonModalProps {
   pokemonId: number | null;
   onClose: () => void;
+  onNavigate?: (id: number) => void;
 }
 
 const STAT_LABELS: Record<string, string> = {
@@ -17,8 +21,13 @@ const STAT_LABELS: Record<string, string> = {
   speed: "SPD",
 };
 
-const PokemonModal = ({ pokemonId, onClose }: PokemonModalProps) => {
+const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => {
   const { data: pokemon, isLoading } = usePokemonDetail(pokemonId);
+  const { shiny } = useSettings();
+
+  useEffect(() => {
+    if (pokemonId) trackView(pokemonId);
+  }, [pokemonId]);
 
   return (
     <AnimatePresence>
@@ -66,42 +75,56 @@ const PokemonModal = ({ pokemonId, onClose }: PokemonModalProps) => {
                 <div className="relative z-10 p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                   {/* Left - Image */}
                   <div className="flex flex-col items-center justify-center">
-                    <motion.img
-                      src={pokemon.officialArtwork}
-                      alt={pokemon.name}
-                      className="w-64 h-64 object-contain"
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.1 }}
-                      style={{
-                        filter: `drop-shadow(0 0 30px hsl(${getTypeColor(pokemon.types[0])} / 0.5))`,
-                      }}
-                    />
+                    <div className="relative">
+                      <motion.img
+                        key={shiny ? "shiny" : "normal"}
+                        src={shiny ? pokemon.shinyOfficialArtwork : pokemon.officialArtwork}
+                        alt={pokemon.name}
+                        className={`w-64 h-64 object-contain ${shiny ? "saturate-150" : ""}`}
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                        style={{
+                          filter: `drop-shadow(0 0 30px hsl(${
+                            shiny ? "47 100% 55%" : getTypeColor(pokemon.types[0])
+                          } / 0.5))`,
+                        }}
+                      />
+                      {shiny && (
+                        <Sparkles className="absolute top-2 right-2 w-6 h-6 text-secondary animate-pulse" />
+                      )}
+                    </div>
 
                     {/* Animated sprite */}
                     {pokemon.animatedSprite && pokemon.animatedSprite !== pokemon.sprite && (
                       <img
-                        src={pokemon.animatedSprite}
+                        src={
+                          shiny
+                            ? pokemon.shinyAnimatedSprite || pokemon.shinySprite
+                            : pokemon.animatedSprite
+                        }
                         alt={`${pokemon.name} animated`}
                         className="w-20 h-20 mt-2"
                         style={{ imageRendering: "pixelated" }}
                       />
                     )}
 
-                    {/* Evolution Chain */}
+                    {/* Evolution Chain — clickable mini-map */}
                     {pokemon.evolutionChain.length > 1 && (
                       <div className="mt-6 w-full">
                         <h4 className="font-pixel text-[10px] text-muted-foreground mb-3 text-center">
-                          EVOLUTION
+                          EVOLUTION MAP
                         </h4>
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-2 flex-wrap">
                           {pokemon.evolutionChain.map((evo, i) => (
                             <div key={evo.id} className="flex items-center gap-2">
-                              <div
-                                className={`flex flex-col items-center p-2 rounded-lg ${
+                              <button
+                                onClick={() => evo.id !== pokemon.id && onNavigate?.(evo.id)}
+                                disabled={evo.id === pokemon.id}
+                                className={`flex flex-col items-center p-2 rounded-lg transition-all ${
                                   evo.id === pokemon.id
-                                    ? "bg-primary/20 border border-primary/30"
-                                    : "bg-muted/30"
+                                    ? "bg-primary/20 border border-primary/50 cursor-default"
+                                    : "bg-muted/30 hover:bg-muted/60 hover:scale-110 cursor-pointer border border-transparent hover:border-primary/30"
                                 }`}
                               >
                                 <img
@@ -113,7 +136,7 @@ const PokemonModal = ({ pokemonId, onClose }: PokemonModalProps) => {
                                 <span className="font-pixel text-[6px] capitalize mt-1 text-foreground">
                                   {evo.name}
                                 </span>
-                              </div>
+                              </button>
                               {i < pokemon.evolutionChain.length - 1 && (
                                 <span className="text-muted-foreground text-lg">→</span>
                               )}
