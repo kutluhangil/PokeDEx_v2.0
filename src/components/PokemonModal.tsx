@@ -145,42 +145,6 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                         </div>
                       </div>
                     )}
-                    {/* keep the original block closing safe */}
-
-                    {/* Evolution Chain */}
-                    {pokemon.evolutionChain.length > 1 && (
-                      <div className="mt-6 w-full">
-                        <h4 className="font-pixel text-[10px] text-muted-foreground mb-3 text-center">
-                          EVOLUTION
-                        </h4>
-                        <div className="flex items-center justify-center gap-2">
-                          {pokemon.evolutionChain.map((evo, i) => (
-                            <div key={evo.id} className="flex items-center gap-2">
-                              <div
-                                className={`flex flex-col items-center p-2 rounded-lg ${
-                                  evo.id === pokemon.id
-                                    ? "bg-primary/20 border border-primary/30"
-                                    : "bg-muted/30"
-                                }`}
-                              >
-                                <img
-                                  src={evo.sprite}
-                                  alt={evo.name}
-                                  className="w-12 h-12"
-                                  style={{ imageRendering: "pixelated" }}
-                                />
-                                <span className="font-pixel text-[6px] capitalize mt-1 text-foreground">
-                                  {evo.name}
-                                </span>
-                              </div>
-                              {i < pokemon.evolutionChain.length - 1 && (
-                                <span className="text-muted-foreground text-lg">→</span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* Right - Info */}
