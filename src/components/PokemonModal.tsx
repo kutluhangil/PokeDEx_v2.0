@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Share2 } from "lucide-react";
+import { X, Sparkles, Share2, QrCode, AlertTriangle } from "lucide-react";
+import QRCode from "react-qr-code";
 import { toast } from "sonner";
 import { usePokemonDetail } from "@/hooks/usePokemon";
 import { getTypeColor, getTypeGradient } from "@/lib/pokemon";
