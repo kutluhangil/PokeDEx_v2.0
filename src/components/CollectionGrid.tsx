@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { type PokemonBasic } from "@/lib/pokemon";
 import PokemonCard from "./PokemonCard";
@@ -19,8 +20,24 @@ const FILTERS: { key: FilterMode; label: string }[] = [
   { key: "mythical", label: "MYTHICAL" },
 ];
 
+const VALID: FilterMode[] = ["all", "gen1", "gen2", "gen3", "legendary", "mythical"];
+
 const CollectionGrid = ({ pokemon, onSelect }: CollectionGridProps) => {
-  const [filter, setFilter] = useState<FilterMode>("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filterParam = searchParams.get("filter") as FilterMode | null;
+  const filter: FilterMode = filterParam && VALID.includes(filterParam) ? filterParam : "all";
+
+  const setFilter = (next: FilterMode) => {
+    const params = new URLSearchParams(searchParams);
+    if (next === "all") params.delete("filter");
+    else params.set("filter", next);
+    setSearchParams(params, { replace: true });
+  };
+
+  // Scroll into view when filter changes via URL (e.g., back from modal)
+  useEffect(() => {
+    /* no-op, kept for future enhancement */
+  }, [filter]);
 
   const filtered = useMemo(() => {
     switch (filter) {
