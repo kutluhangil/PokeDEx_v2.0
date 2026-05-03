@@ -98,8 +98,19 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                 {/* Action buttons */}
                 <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
                   <button
+                    onClick={() => setShowQR((v) => !v)}
+                    title="Show QR code"
+                    className={`p-2 rounded-lg transition-colors text-foreground ${
+                      showQR ? "bg-primary/30" : "bg-muted/50 hover:bg-muted"
+                    }`}
+                  >
+                    <QrCode className="w-5 h-5" />
+                  </button>
+                  <button
                     onClick={async () => {
                       const url = `${window.location.origin}/pokemon/${pokemon.id}`;
+                      const showCopiedToast = () =>
+                        toast.success("Link copied!", { description: url });
                       try {
                         if (navigator.share) {
                           await navigator.share({
@@ -107,16 +118,17 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                             text: `Check out ${pokemon.name} on Pokédex!`,
                             url,
                           });
+                          toast.success("Link shared!", { description: url });
                         } else {
                           await navigator.clipboard.writeText(url);
-                          toast.success("Link copied to clipboard!");
+                          showCopiedToast();
                         }
                       } catch {
                         try {
                           await navigator.clipboard.writeText(url);
-                          toast.success("Link copied to clipboard!");
+                          showCopiedToast();
                         } catch {
-                          toast.error("Could not copy link");
+                          toast.error("Could not copy link", { description: url });
                         }
                       }
                     }}
@@ -133,6 +145,28 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                     <X className="w-5 h-5" />
                   </button>
                 </div>
+
+                {/* QR Code overlay */}
+                <AnimatePresence>
+                  {showQR && (
+                    <motion.div
+                      className="absolute top-16 right-4 z-20 glass-card p-4 flex flex-col items-center gap-2"
+                      initial={{ opacity: 0, scale: 0.8, y: -10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, y: -10 }}
+                    >
+                      <div className="bg-white p-2 rounded">
+                        <QRCode
+                          value={`${window.location.origin}/pokemon/${pokemon.id}`}
+                          size={128}
+                        />
+                      </div>
+                      <span className="font-pixel text-[7px] text-muted-foreground">
+                        SCAN TO OPEN
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <div className="relative z-10 p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                   {/* Left - Image */}
