@@ -35,13 +35,31 @@ const Index = () => {
     }
   }, [selectedPokemonId]);
 
+  // Persist scroll position when opening/closing the modal
+  const savedScrollRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (selectedPokemonId !== null) {
+      // Modal opened — remember where we were, then scroll to top
+      if (savedScrollRef.current === null) {
+        savedScrollRef.current = window.scrollY;
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (savedScrollRef.current !== null) {
+      // Modal closed — restore previous position
+      const y = savedScrollRef.current;
+      savedScrollRef.current = null;
+      // Wait a tick so layout is in place
+      requestAnimationFrame(() => window.scrollTo({ top: y, behavior: "smooth" }));
+    }
+  }, [selectedPokemonId]);
+
   const handleIntroComplete = useCallback(() => {
     setIntroComplete(true);
   }, []);
 
   const openPokemon = useCallback(
     (pid: number) => {
-      // Preserve filter query string across navigation
       navigate(`/pokemon/${pid}${location.search}`);
     },
     [navigate, location.search]
@@ -50,6 +68,23 @@ const Index = () => {
   const closePokemon = useCallback(() => {
     navigate(`/${location.search}`);
   }, [navigate, location.search]);
+
+  const goToSearch = useCallback(
+    (prefill?: string) => {
+      const params = new URLSearchParams(location.search);
+      if (prefill) params.set("q", prefill);
+      const qs = params.toString();
+      navigate(`/${qs ? `?${qs}` : ""}`);
+      // Scroll/focus the search input after navigation
+      requestAnimationFrame(() => {
+        const el = document.getElementById("pokedex-search-input") as HTMLInputElement | null;
+        const section = document.getElementById("search-section");
+        section?.scrollIntoView({ behavior: "smooth", block: "start" });
+        setTimeout(() => el?.focus(), 400);
+      });
+    },
+    [navigate, location.search]
+  );
 
   const handleRandom = useCallback(() => {
     if (pokemon.length === 0) return;
