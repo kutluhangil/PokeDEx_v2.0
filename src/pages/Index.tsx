@@ -27,13 +27,6 @@ const Index = () => {
     if (id && !introComplete) setIntroComplete(true);
   }, [id, introComplete]);
 
-  // When deep-linking (or pasting a URL while searching), scroll to top
-  // so the modal isn't lost behind other content.
-  useEffect(() => {
-    if (selectedPokemonId !== null) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [selectedPokemonId]);
 
   // Persist scroll position when opening/closing the modal
   const savedScrollRef = useRef<number | null>(null);
