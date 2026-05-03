@@ -24,11 +24,18 @@ const STAT_LABELS: Record<string, string> = {
 };
 
 const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => {
-  const { data: pokemon, isLoading } = usePokemonDetail(pokemonId);
+  const isInvalid = pokemonId === -1;
+  const fetchId = isInvalid ? null : pokemonId;
+  const { data: pokemon, isLoading } = usePokemonDetail(fetchId);
   const { shiny } = useSettings();
+  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
-    if (pokemonId) trackView(pokemonId);
+    if (pokemonId && !isInvalid) trackView(pokemonId);
+  }, [pokemonId, isInvalid]);
+
+  useEffect(() => {
+    setShowQR(false);
   }, [pokemonId]);
 
   return (
@@ -54,7 +61,29 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
             exit={{ scale: 0.8, y: 50 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
-            {isLoading || !pokemon ? (
+            {isInvalid ? (
+              <div className="relative z-10 flex flex-col items-center justify-center text-center p-10 gap-4">
+                <AlertTriangle className="w-12 h-12 text-primary" />
+                <h2 className="font-pixel text-sm text-foreground">POKÉMON NOT FOUND</h2>
+                <p className="font-body text-sm text-muted-foreground max-w-sm">
+                  The link you opened doesn't match any Pokémon in the Pokédex.
+                  Try searching or pick one from the collection.
+                </p>
+                <button
+                  onClick={onClose}
+                  className="mt-2 font-pixel text-[10px] px-5 py-2 rounded-lg bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 transition-colors"
+                >
+                  BACK TO POKÉDEX
+                </button>
+                <button
+                  onClick={onClose}
+                  title="Close"
+                  className="absolute top-4 right-4 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            ) : isLoading || !pokemon ? (
               <div className="flex items-center justify-center h-64">
                 <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
