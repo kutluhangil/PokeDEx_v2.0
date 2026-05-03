@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Share2, QrCode, AlertTriangle } from "lucide-react";
+import { X, Sparkles, Share2, QrCode, AlertTriangle, Link as LinkIcon } from "lucide-react";
 import QRCode from "react-qr-code";
+import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { usePokemonDetail } from "@/hooks/usePokemon";
 import { getTypeColor, getTypeGradient } from "@/lib/pokemon";
@@ -10,8 +11,10 @@ import { trackView } from "@/lib/viewTracker";
 
 interface PokemonModalProps {
   pokemonId: number | null;
+  invalidId?: string | null;
   onClose: () => void;
   onNavigate?: (id: number) => void;
+  onGoToSearch?: (prefill?: string) => void;
 }
 
 const STAT_LABELS: Record<string, string> = {
