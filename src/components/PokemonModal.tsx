@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Share2, QrCode, AlertTriangle } from "lucide-react";
+import { X, Sparkles, Share2, QrCode, AlertTriangle, Link as LinkIcon } from "lucide-react";
 import QRCode from "react-qr-code";
+import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { usePokemonDetail } from "@/hooks/usePokemon";
 import { getTypeColor, getTypeGradient } from "@/lib/pokemon";
@@ -10,8 +11,10 @@ import { trackView } from "@/lib/viewTracker";
 
 interface PokemonModalProps {
   pokemonId: number | null;
+  invalidId?: string | null;
   onClose: () => void;
   onNavigate?: (id: number) => void;
+  onGoToSearch?: (prefill?: string) => void;
 }
 
 const STAT_LABELS: Record<string, string> = {
@@ -23,12 +26,16 @@ const STAT_LABELS: Record<string, string> = {
   speed: "SPD",
 };
 
-const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => {
+const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch }: PokemonModalProps) => {
   const isInvalid = pokemonId === -1;
   const fetchId = isInvalid ? null : pokemonId;
   const { data: pokemon, isLoading } = usePokemonDetail(fetchId);
   const { shiny } = useSettings();
+  const location = useLocation();
   const [showQR, setShowQR] = useState(false);
+
+  const buildShareUrl = (id: number) =>
+    `${window.location.origin}/pokemon/${id}${location.search}`;
 
   useEffect(() => {
     if (pokemonId && !isInvalid) trackView(pokemonId);
@@ -67,14 +74,29 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                 <h2 className="font-pixel text-sm text-foreground">POKÉMON NOT FOUND</h2>
                 <p className="font-body text-sm text-muted-foreground max-w-sm">
                   The link you opened doesn't match any Pokémon in the Pokédex.
-                  Try searching or pick one from the collection.
+                  {invalidId && (
+                    <>
+                      {" "}
+                      <span className="text-foreground">"{invalidId}"</span> isn't a valid ID.
+                    </>
+                  )}
                 </p>
-                <button
-                  onClick={onClose}
-                  className="mt-2 font-pixel text-[10px] px-5 py-2 rounded-lg bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 transition-colors"
-                >
-                  BACK TO POKÉDEX
-                </button>
+                <div className="flex flex-wrap gap-2 justify-center mt-2">
+                  <button
+                    onClick={onClose}
+                    className="font-pixel text-[10px] px-5 py-2 rounded-lg bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 transition-colors"
+                  >
+                    BACK TO POKÉDEX
+                  </button>
+                  {onGoToSearch && (
+                    <button
+                      onClick={() => onGoToSearch(invalidId ?? undefined)}
+                      className="font-pixel text-[10px] px-5 py-2 rounded-lg bg-secondary/20 border border-secondary/50 text-secondary hover:bg-secondary/30 transition-colors"
+                    >
+                      GO TO SEARCH
+                    </button>
+                  )}
+                </div>
                 <button
                   onClick={onClose}
                   title="Close"
@@ -108,7 +130,22 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                   </button>
                   <button
                     onClick={async () => {
-                      const url = `${window.location.origin}/pokemon/${pokemon.id}`;
+                      const url = buildShareUrl(pokemon.id);
+                      try {
+                        await navigator.clipboard.writeText(url);
+                        toast.success("Link copied!", { description: url });
+                      } catch {
+                        toast.error("Could not copy link", { description: url });
+                      }
+                    }}
+                    title="Copy link"
+                    className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
+                  >
+                    <LinkIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const url = buildShareUrl(pokemon.id);
                       const showCopiedToast = () =>
                         toast.success("Link copied!", { description: url });
                       try {
@@ -157,7 +194,7 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                     >
                       <div className="bg-white p-2 rounded">
                         <QRCode
-                          value={`${window.location.origin}/pokemon/${pokemon.id}`}
+                          value={buildShareUrl(pokemon.id)}
                           size={128}
                         />
                       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { type PokemonBasic } from "@/lib/pokemon";
@@ -22,10 +22,22 @@ const FILTERS: { key: FilterMode; label: string }[] = [
 
 const VALID: FilterMode[] = ["all", "gen1", "gen2", "gen3", "legendary", "mythical"];
 
+const ALL_TYPES = [
+  "normal", "fire", "water", "electric", "grass", "ice",
+  "fighting", "poison", "ground", "flying", "psychic", "bug",
+  "rock", "ghost", "dragon", "dark", "steel", "fairy",
+];
+
 const CollectionGrid = ({ pokemon, onSelect }: CollectionGridProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const filterParam = searchParams.get("filter") as FilterMode | null;
   const filter: FilterMode = filterParam && VALID.includes(filterParam) ? filterParam : "all";
+
+  const typesParam = searchParams.get("types") ?? "";
+  const selectedTypes = useMemo(
+    () => typesParam.split(",").filter((t) => ALL_TYPES.includes(t)),
+    [typesParam]
+  );
 
   const setFilter = (next: FilterMode) => {
     const params = new URLSearchParams(searchParams);
@@ -34,24 +46,39 @@ const CollectionGrid = ({ pokemon, onSelect }: CollectionGridProps) => {
     setSearchParams(params, { replace: true });
   };
 
-  // Scroll into view when filter changes via URL (e.g., back from modal)
-  useEffect(() => {
-    /* no-op, kept for future enhancement */
-  }, [filter]);
+  const toggleType = (type: string) => {
+    const params = new URLSearchParams(searchParams);
+    const next = selectedTypes.includes(type)
+      ? selectedTypes.filter((t) => t !== type)
+      : [...selectedTypes, type];
+    if (next.length === 0) params.delete("types");
+    else params.set("types", next.join(","));
+    setSearchParams(params, { replace: true });
+  };
+
+  const clearTypes = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete("types");
+    setSearchParams(params, { replace: true });
+  };
 
   const filtered = useMemo(() => {
+    let list = pokemon;
     switch (filter) {
-      case "gen1": return pokemon.filter((p) => p.generation === 1);
-      case "gen2": return pokemon.filter((p) => p.generation === 2);
-      case "gen3": return pokemon.filter((p) => p.generation === 3);
-      case "legendary": return pokemon.filter((p) => p.isLegendary);
-      case "mythical": return pokemon.filter((p) => p.isMythical);
-      default: return pokemon;
+      case "gen1": list = list.filter((p) => p.generation === 1); break;
+      case "gen2": list = list.filter((p) => p.generation === 2); break;
+      case "gen3": list = list.filter((p) => p.generation === 3); break;
+      case "legendary": list = list.filter((p) => p.isLegendary); break;
+      case "mythical": list = list.filter((p) => p.isMythical); break;
     }
-  }, [pokemon, filter]);
+    if (selectedTypes.length > 0) {
+      list = list.filter((p) => p.types.some((t) => selectedTypes.includes(t)));
+    }
+    return list;
+  }, [pokemon, filter, selectedTypes]);
 
   return (
-    <section className="py-16 px-4">
+    <section id="collection-section" className="py-16 px-4">
       <div className="max-w-6xl mx-auto">
         <motion.h2
           className="font-pixel text-lg md:text-xl text-center mb-8 text-accent text-glow-cyan"
@@ -62,8 +89,8 @@ const CollectionGrid = ({ pokemon, onSelect }: CollectionGridProps) => {
           COLLECTION
         </motion.h2>
 
-        {/* Filters */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
+        {/* Category Filters */}
+        <div className="flex flex-wrap justify-center gap-2 mb-4">
           {FILTERS.map((f) => (
             <button
               key={f.key}
@@ -77,6 +104,34 @@ const CollectionGrid = ({ pokemon, onSelect }: CollectionGridProps) => {
               {f.label}
             </button>
           ))}
+        </div>
+
+        {/* Type Filters (multi-select) */}
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {ALL_TYPES.map((t) => {
+            const active = selectedTypes.includes(t);
+            return (
+              <button
+                key={t}
+                onClick={() => toggleType(t)}
+                className={`font-pixel text-[7px] uppercase px-3 py-1.5 rounded-full border transition-all ${
+                  active
+                    ? "bg-secondary/30 border-secondary/60 text-secondary"
+                    : "bg-muted/10 border-border text-muted-foreground hover:border-secondary/40 hover:text-foreground"
+                }`}
+              >
+                {t}
+              </button>
+            );
+          })}
+          {selectedTypes.length > 0 && (
+            <button
+              onClick={clearTypes}
+              className="font-pixel text-[7px] px-3 py-1.5 rounded-full border border-destructive/40 text-destructive hover:bg-destructive/10 transition-all"
+            >
+              CLEAR ✕
+            </button>
+          )}
         </div>
 
         {/* Grid */}
