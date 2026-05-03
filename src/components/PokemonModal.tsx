@@ -130,7 +130,22 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                   </button>
                   <button
                     onClick={async () => {
-                      const url = `${window.location.origin}/pokemon/${pokemon.id}`;
+                      const url = buildShareUrl(pokemon.id);
+                      try {
+                        await navigator.clipboard.writeText(url);
+                        toast.success("Link copied!", { description: url });
+                      } catch {
+                        toast.error("Could not copy link", { description: url });
+                      }
+                    }}
+                    title="Copy link"
+                    className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
+                  >
+                    <LinkIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const url = buildShareUrl(pokemon.id);
                       const showCopiedToast = () =>
                         toast.success("Link copied!", { description: url });
                       try {
