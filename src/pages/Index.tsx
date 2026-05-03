@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAllPokemon } from "@/hooks/usePokemon";
 import IntroAnimation from "@/components/IntroAnimation";
