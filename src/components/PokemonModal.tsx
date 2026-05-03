@@ -74,14 +74,29 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                 <h2 className="font-pixel text-sm text-foreground">POKÉMON NOT FOUND</h2>
                 <p className="font-body text-sm text-muted-foreground max-w-sm">
                   The link you opened doesn't match any Pokémon in the Pokédex.
-                  Try searching or pick one from the collection.
+                  {invalidId && (
+                    <>
+                      {" "}
+                      <span className="text-foreground">"{invalidId}"</span> isn't a valid ID.
+                    </>
+                  )}
                 </p>
-                <button
-                  onClick={onClose}
-                  className="mt-2 font-pixel text-[10px] px-5 py-2 rounded-lg bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 transition-colors"
-                >
-                  BACK TO POKÉDEX
-                </button>
+                <div className="flex flex-wrap gap-2 justify-center mt-2">
+                  <button
+                    onClick={onClose}
+                    className="font-pixel text-[10px] px-5 py-2 rounded-lg bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 transition-colors"
+                  >
+                    BACK TO POKÉDEX
+                  </button>
+                  {onGoToSearch && (
+                    <button
+                      onClick={() => onGoToSearch(invalidId ?? undefined)}
+                      className="font-pixel text-[10px] px-5 py-2 rounded-lg bg-secondary/20 border border-secondary/50 text-secondary hover:bg-secondary/30 transition-colors"
+                    >
+                      GO TO SEARCH
+                    </button>
+                  )}
+                </div>
                 <button
                   onClick={onClose}
                   title="Close"
