@@ -141,8 +141,10 @@ const Index = () => {
       {/* Modal */}
       <PokemonModal
         pokemonId={selectedPokemonId}
+        invalidId={id && !/^\d+$/.test(id) ? id : null}
         onClose={closePokemon}
         onNavigate={openPokemon}
+        onGoToSearch={goToSearch}
       />
     </div>
   );
