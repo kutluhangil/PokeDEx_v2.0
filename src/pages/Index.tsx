@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAllPokemon } from "@/hooks/usePokemon";
 import IntroAnimation from "@/components/IntroAnimation";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -12,16 +12,28 @@ import Leaderboard from "@/components/Leaderboard";
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams<{ id: string }>();
-  const selectedPokemonId = id ? parseInt(id, 10) || null : null;
+  // -1 = invalid id sentinel (so modal can show a not-found state)
+  const selectedPokemonId = id
+    ? (/^\d+$/.test(id) ? parseInt(id, 10) : -1)
+    : null;
 
   const { data: pokemon = [], isLoading } = useAllPokemon();
   // Skip intro if user is landing on a deep link
-  const [introComplete, setIntroComplete] = useState(!!selectedPokemonId);
+  const [introComplete, setIntroComplete] = useState(!!id);
 
   useEffect(() => {
-    if (selectedPokemonId && !introComplete) setIntroComplete(true);
-  }, [selectedPokemonId, introComplete]);
+    if (id && !introComplete) setIntroComplete(true);
+  }, [id, introComplete]);
+
+  // When deep-linking (or pasting a URL while searching), scroll to top
+  // so the modal isn't lost behind other content.
+  useEffect(() => {
+    if (selectedPokemonId !== null) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [selectedPokemonId]);
 
   const handleIntroComplete = useCallback(() => {
     setIntroComplete(true);
@@ -29,14 +41,15 @@ const Index = () => {
 
   const openPokemon = useCallback(
     (pid: number) => {
-      navigate(`/pokemon/${pid}`);
+      // Preserve filter query string across navigation
+      navigate(`/pokemon/${pid}${location.search}`);
     },
-    [navigate]
+    [navigate, location.search]
   );
 
   const closePokemon = useCallback(() => {
-    navigate("/");
-  }, [navigate]);
+    navigate(`/${location.search}`);
+  }, [navigate, location.search]);
 
   const handleRandom = useCallback(() => {
     if (pokemon.length === 0) return;

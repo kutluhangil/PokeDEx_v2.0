@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Share2 } from "lucide-react";
+import { X, Sparkles, Share2, QrCode, AlertTriangle } from "lucide-react";
+import QRCode from "react-qr-code";
 import { toast } from "sonner";
 import { usePokemonDetail } from "@/hooks/usePokemon";
 import { getTypeColor, getTypeGradient } from "@/lib/pokemon";
@@ -23,11 +24,18 @@ const STAT_LABELS: Record<string, string> = {
 };
 
 const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => {
-  const { data: pokemon, isLoading } = usePokemonDetail(pokemonId);
+  const isInvalid = pokemonId === -1;
+  const fetchId = isInvalid ? null : pokemonId;
+  const { data: pokemon, isLoading } = usePokemonDetail(fetchId);
   const { shiny } = useSettings();
+  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
-    if (pokemonId) trackView(pokemonId);
+    if (pokemonId && !isInvalid) trackView(pokemonId);
+  }, [pokemonId, isInvalid]);
+
+  useEffect(() => {
+    setShowQR(false);
   }, [pokemonId]);
 
   return (
@@ -53,7 +61,29 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
             exit={{ scale: 0.8, y: 50 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
-            {isLoading || !pokemon ? (
+            {isInvalid ? (
+              <div className="relative z-10 flex flex-col items-center justify-center text-center p-10 gap-4">
+                <AlertTriangle className="w-12 h-12 text-primary" />
+                <h2 className="font-pixel text-sm text-foreground">POKÉMON NOT FOUND</h2>
+                <p className="font-body text-sm text-muted-foreground max-w-sm">
+                  The link you opened doesn't match any Pokémon in the Pokédex.
+                  Try searching or pick one from the collection.
+                </p>
+                <button
+                  onClick={onClose}
+                  className="mt-2 font-pixel text-[10px] px-5 py-2 rounded-lg bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 transition-colors"
+                >
+                  BACK TO POKÉDEX
+                </button>
+                <button
+                  onClick={onClose}
+                  title="Close"
+                  className="absolute top-4 right-4 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            ) : isLoading || !pokemon ? (
               <div className="flex items-center justify-center h-64">
                 <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
@@ -68,8 +98,19 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                 {/* Action buttons */}
                 <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
                   <button
+                    onClick={() => setShowQR((v) => !v)}
+                    title="Show QR code"
+                    className={`p-2 rounded-lg transition-colors text-foreground ${
+                      showQR ? "bg-primary/30" : "bg-muted/50 hover:bg-muted"
+                    }`}
+                  >
+                    <QrCode className="w-5 h-5" />
+                  </button>
+                  <button
                     onClick={async () => {
                       const url = `${window.location.origin}/pokemon/${pokemon.id}`;
+                      const showCopiedToast = () =>
+                        toast.success("Link copied!", { description: url });
                       try {
                         if (navigator.share) {
                           await navigator.share({
@@ -77,16 +118,17 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                             text: `Check out ${pokemon.name} on Pokédex!`,
                             url,
                           });
+                          toast.success("Link shared!", { description: url });
                         } else {
                           await navigator.clipboard.writeText(url);
-                          toast.success("Link copied to clipboard!");
+                          showCopiedToast();
                         }
                       } catch {
                         try {
                           await navigator.clipboard.writeText(url);
-                          toast.success("Link copied to clipboard!");
+                          showCopiedToast();
                         } catch {
-                          toast.error("Could not copy link");
+                          toast.error("Could not copy link", { description: url });
                         }
                       }
                     }}
@@ -103,6 +145,28 @@ const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => 
                     <X className="w-5 h-5" />
                   </button>
                 </div>
+
+                {/* QR Code overlay */}
+                <AnimatePresence>
+                  {showQR && (
+                    <motion.div
+                      className="absolute top-16 right-4 z-20 glass-card p-4 flex flex-col items-center gap-2"
+                      initial={{ opacity: 0, scale: 0.8, y: -10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, y: -10 }}
+                    >
+                      <div className="bg-white p-2 rounded">
+                        <QRCode
+                          value={`${window.location.origin}/pokemon/${pokemon.id}`}
+                          size={128}
+                        />
+                      </div>
+                      <span className="font-pixel text-[7px] text-muted-foreground">
+                        SCAN TO OPEN
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <div className="relative z-10 p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                   {/* Left - Image */}
