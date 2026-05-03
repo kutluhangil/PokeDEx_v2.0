@@ -194,7 +194,7 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                     >
                       <div className="bg-white p-2 rounded">
                         <QRCode
-                          value={`${window.location.origin}/pokemon/${pokemon.id}`}
+                          value={buildShareUrl(pokemon.id)}
                           size={128}
                         />
                       </div>
