@@ -26,12 +26,16 @@ const STAT_LABELS: Record<string, string> = {
   speed: "SPD",
 };
 
-const PokemonModal = ({ pokemonId, onClose, onNavigate }: PokemonModalProps) => {
+const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch }: PokemonModalProps) => {
   const isInvalid = pokemonId === -1;
   const fetchId = isInvalid ? null : pokemonId;
   const { data: pokemon, isLoading } = usePokemonDetail(fetchId);
   const { shiny } = useSettings();
+  const location = useLocation();
   const [showQR, setShowQR] = useState(false);
+
+  const buildShareUrl = (id: number) =>
+    `${window.location.origin}/pokemon/${id}${location.search}`;
 
   useEffect(() => {
     if (pokemonId && !isInvalid) trackView(pokemonId);
