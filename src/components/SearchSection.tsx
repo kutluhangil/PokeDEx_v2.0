@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { type PokemonBasic } from "@/lib/pokemon";
@@ -10,7 +11,15 @@ interface SearchSectionProps {
 }
 
 const SearchSection = ({ pokemon, onSelect }: SearchSectionProps) => {
-  const [query, setQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("q") ?? "";
+
+  const setQuery = (v: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (v) params.set("q", v);
+    else params.delete("q");
+    setSearchParams(params, { replace: true });
+  };
 
   const results = useMemo(() => {
     if (!query.trim()) return [];
@@ -26,7 +35,7 @@ const SearchSection = ({ pokemon, onSelect }: SearchSectionProps) => {
   }, [query, pokemon]);
 
   return (
-    <section className="relative py-16 px-4">
+    <section id="search-section" className="relative py-16 px-4 scroll-mt-20">
       <div className="max-w-4xl mx-auto">
         <motion.h2
           className="font-pixel text-lg md:text-xl text-center mb-2 text-secondary text-glow-yellow"
@@ -56,6 +65,7 @@ const SearchSection = ({ pokemon, onSelect }: SearchSectionProps) => {
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
+              id="pokedex-search-input"
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -63,7 +73,6 @@ const SearchSection = ({ pokemon, onSelect }: SearchSectionProps) => {
               className="w-full pl-12 pr-4 py-4 bg-muted/30 border border-border rounded-xl font-pixel text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
             />
           </div>
-          {/* Scanline effect on search area */}
           <div className="absolute inset-0 scanline-overlay pointer-events-none rounded-xl opacity-10" />
         </motion.div>
 
