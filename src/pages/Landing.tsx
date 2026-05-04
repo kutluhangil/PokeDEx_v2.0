@@ -4,6 +4,75 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring } from "fram
 import { ArrowRight, Sparkles, Zap, Search, Trophy, QrCode, Palette } from "lucide-react";
 import PixelParticles from "@/components/PixelParticles";
 
+// Cinematic parallax showcase — legendary/iconic Pokémon sprites at varied depths
+const SHOWCASE = [
+  { id: 150, left: "6%",  top: "18%", size: 200, depth: 60, delay: 0.1, float: 5 }, // Mewtwo
+  { id: 6,   left: "82%", top: "14%", size: 180, depth: 50, delay: 0.3, float: 6 }, // Charizard
+  { id: 249, left: "12%", top: "62%", size: 220, depth: 70, delay: 0.5, float: 7 }, // Lugia
+  { id: 384, left: "78%", top: "58%", size: 200, depth: 55, delay: 0.7, float: 5 }, // Rayquaza
+  { id: 25,  left: "44%", top: "8%",  size: 110, depth: 35, delay: 0.9, float: 4 }, // Pikachu
+  { id: 448, left: "48%", top: "78%", size: 130, depth: 40, delay: 1.1, float: 5 }, // Lucario
+  { id: 94,  left: "26%", top: "32%", size: 90,  depth: 25, delay: 1.3, float: 4 }, // Gengar
+  { id: 130, left: "70%", top: "36%", size: 100, depth: 30, delay: 1.5, float: 4 }, // Gyarados
+] as const;
+
+const spriteUrl = (id: number) =>
+  `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+
+const ParallaxSprite = ({
+  id,
+  left,
+  top,
+  size,
+  depth,
+  delay,
+  float,
+  mx,
+  my,
+}: {
+  id: number;
+  left: string;
+  top: string;
+  size: number;
+  depth: number;
+  delay: number;
+  float: number;
+  mx: ReturnType<typeof useMotionValue<number>>;
+  my: ReturnType<typeof useMotionValue<number>>;
+}) => {
+  const tx = useSpring(useTransform(mx, [-1, 1], [-depth, depth]), { stiffness: 60, damping: 20 });
+  const ty = useSpring(useTransform(my, [-1, 1], [-depth, depth]), { stiffness: 60, damping: 20 });
+
+  return (
+    <motion.div
+      className="absolute pointer-events-none select-none"
+      style={{ left, top, width: size, height: size, x: tx, y: ty }}
+      initial={{ opacity: 0, scale: 0.6 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 1, delay, ease: "easeOut" }}
+    >
+      <motion.div
+        className="relative w-full h-full"
+        animate={{ y: [0, -12, 0] }}
+        transition={{ duration: float, repeat: Infinity, ease: "easeInOut", delay }}
+      >
+        <img
+          src={spriteUrl(id)}
+          alt=""
+          loading="lazy"
+          draggable={false}
+          className="w-full h-full object-contain drop-shadow-[0_0_30px_hsl(var(--primary)/0.45)]"
+          style={{ imageRendering: "auto" }}
+        />
+        <div
+          className="absolute inset-0 -z-10 rounded-full blur-3xl bg-primary/20"
+          style={{ filter: "blur(40px)" }}
+        />
+      </motion.div>
+    </motion.div>
+  );
+};
+
 const TITLE = "POKEDEX";
 const TAGLINE = "A retro-futuristic Pokédex experience.";
 
@@ -93,6 +162,18 @@ const Landing = () => {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
+  // Global mouse parallax (-1..1)
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      mx.set((e.clientX / window.innerWidth) * 2 - 1);
+      my.set((e.clientY / window.innerHeight) * 2 - 1);
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [mx, my]);
+
   useEffect(() => {
     const timers: NodeJS.Timeout[] = [];
     for (let i = 0; i <= TITLE.length; i++) {
@@ -161,17 +242,20 @@ const Landing = () => {
       </header>
 
       {/* HERO */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-6 pt-24">
-        {/* Floating pokeballs */}
-        <FloatingPokeball delay={0.2} size={80} left="6%" top="22%" color="primary" />
-        <FloatingPokeball delay={0.5} size={50} left="88%" top="28%" color="secondary" />
-        <FloatingPokeball delay={0.8} size={64} left="12%" top="72%" color="accent" />
-        <FloatingPokeball delay={1.1} size={42} left="84%" top="68%" color="primary" />
-        <FloatingPokeball delay={1.4} size={36} left="48%" top="14%" color="secondary" />
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-6 pt-24 overflow-hidden">
+        {/* Cinematic parallax sprite showcase */}
+        <div className="absolute inset-0 pointer-events-none">
+          {SHOWCASE.map((s) => (
+            <ParallaxSprite key={s.id} {...s} mx={mx} my={my} />
+          ))}
+        </div>
 
         {/* Glow orbs */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[120px] pointer-events-none" />
+
+        {/* Vignette so center text stays readable */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_0%,hsl(var(--background)/0.55)_45%,hsl(var(--background)/0.92)_85%)]" />
 
         <motion.div
           style={{ y: heroY, opacity: heroOpacity }}
