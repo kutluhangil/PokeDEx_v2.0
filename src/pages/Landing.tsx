@@ -242,17 +242,20 @@ const Landing = () => {
       </header>
 
       {/* HERO */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-6 pt-24">
-        {/* Floating pokeballs */}
-        <FloatingPokeball delay={0.2} size={80} left="6%" top="22%" color="primary" />
-        <FloatingPokeball delay={0.5} size={50} left="88%" top="28%" color="secondary" />
-        <FloatingPokeball delay={0.8} size={64} left="12%" top="72%" color="accent" />
-        <FloatingPokeball delay={1.1} size={42} left="84%" top="68%" color="primary" />
-        <FloatingPokeball delay={1.4} size={36} left="48%" top="14%" color="secondary" />
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-6 pt-24 overflow-hidden">
+        {/* Cinematic parallax sprite showcase */}
+        <div className="absolute inset-0 pointer-events-none">
+          {SHOWCASE.map((s) => (
+            <ParallaxSprite key={s.id} {...s} mx={mx} my={my} />
+          ))}
+        </div>
 
         {/* Glow orbs */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[120px] pointer-events-none" />
+
+        {/* Vignette so center text stays readable */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_0%,hsl(var(--background)/0.55)_45%,hsl(var(--background)/0.92)_85%)]" />
 
         <motion.div
           style={{ y: heroY, opacity: heroOpacity }}
