@@ -59,7 +59,7 @@ const Index = () => {
   );
 
   const closePokemon = useCallback(() => {
-    navigate(`/${location.search}`);
+    navigate(`/explore${location.search}`);
   }, [navigate, location.search]);
 
   const goToSearch = useCallback(
@@ -67,7 +67,7 @@ const Index = () => {
       const params = new URLSearchParams(location.search);
       if (prefill) params.set("q", prefill);
       const qs = params.toString();
-      navigate(`/${qs ? `?${qs}` : ""}`);
+      navigate(`/explore${qs ? `?${qs}` : ""}`);
       // Scroll/focus the search input after navigation
       requestAnimationFrame(() => {
         const el = document.getElementById("pokedex-search-input") as HTMLInputElement | null;
@@ -103,7 +103,7 @@ const Index = () => {
               <div className="flex items-center gap-3 min-w-0">
                 <h1
                   className="font-pixel text-sm text-primary text-glow-red cursor-pointer"
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/explore")}
                 >
                   POKEDEX
                 </h1>
