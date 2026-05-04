@@ -162,6 +162,18 @@ const Landing = () => {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
+  // Global mouse parallax (-1..1)
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      mx.set((e.clientX / window.innerWidth) * 2 - 1);
+      my.set((e.clientY / window.innerHeight) * 2 - 1);
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [mx, my]);
+
   useEffect(() => {
     const timers: NodeJS.Timeout[] = [];
     for (let i = 0; i <= TITLE.length; i++) {
