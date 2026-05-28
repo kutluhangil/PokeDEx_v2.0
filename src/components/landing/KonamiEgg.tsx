@@ -58,9 +58,9 @@ const KonamiEgg = () => {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}
-            className="absolute top-24 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg bg-pixel-pink/90 border-2 border-pixel-pink shadow-[0_0_40px_hsl(var(--pixel-pink)/0.7)]"
+            className="absolute top-24 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg bg-accent border-2 border-accent shadow-[0_0_40px_hsl(var(--accent)/0.7)]"
           >
-            <span className="font-pixel text-xs text-background tracking-widest">
+            <span className="font-pixel text-xs text-accent-foreground tracking-widest">
               ✦ MEW APPEARED! ✦
             </span>
           </motion.div>
@@ -74,7 +74,7 @@ const KonamiEgg = () => {
               animate={{ y: typeof window !== "undefined" ? window.innerHeight + 200 : 1200, rotate: d.rot, opacity: [0, 1, 1, 0.3] }}
               transition={{ duration: 4.5, delay: d.delay, ease: "easeIn" }}
               style={{ left: `${d.left}%`, width: d.size, height: d.size }}
-              className="absolute drop-shadow-[0_0_25px_hsl(var(--pixel-pink)/0.8)]"
+              className="absolute drop-shadow-[0_0_25px_hsl(var(--accent)/0.8)]"
             />
           ))}
         </motion.div>

@@ -58,7 +58,7 @@ const TrendingNow = () => {
           </div>
         </motion.div>
 
-        <div className="relative -mx-6 px-6 overflow-x-auto scrollbar-hide">
+        <div className="relative -mx-6 px-6 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           <div className="flex gap-4 pb-4 min-w-min">
             {items.map((p, i) => (
               <motion.div
