@@ -1,8 +1,41 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring, useInView, animate } from "framer-motion";
 import { ArrowRight, Sparkles, Zap, Search, Trophy, QrCode, Palette } from "lucide-react";
 import PixelParticles from "@/components/PixelParticles";
+
+// Animated count-up that triggers when scrolled into view
+const CountUp = ({
+  to,
+  suffix = "",
+  duration = 2,
+  fallback,
+}: {
+  to: number;
+  suffix?: string;
+  duration?: number;
+  fallback?: string;
+}) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const [val, setVal] = useState(0);
+
+  useEffect(() => {
+    if (!inView || fallback) return;
+    const controls = animate(0, to, {
+      duration,
+      ease: "easeOut",
+      onUpdate: (v) => setVal(Math.floor(v)),
+    });
+    return () => controls.stop();
+  }, [inView, to, duration, fallback]);
+
+  return (
+    <span ref={ref}>
+      {fallback ?? `${val.toLocaleString()}${suffix}`}
+    </span>
+  );
+};
 
 // Cinematic parallax showcase — legendary/iconic Pokémon sprites at varied depths
 const SHOWCASE = [
@@ -366,10 +399,10 @@ const Landing = () => {
       <section className="relative z-10 py-24 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { v: "1000+", l: "POKÉMON" },
-            { v: "9", l: "GENERATIONS" },
-            { v: "18", l: "TYPES" },
-            { v: "∞", l: "POSSIBILITIES" },
+            { to: 1000, suffix: "+", l: "POKÉMON" },
+            { to: 9, suffix: "", l: "GENERATIONS" },
+            { to: 18, suffix: "", l: "TYPES" },
+            { to: 0, suffix: "", l: "POSSIBILITIES", fallback: "∞" },
           ].map((s, i) => (
             <motion.div
               key={s.l}
@@ -380,7 +413,7 @@ const Landing = () => {
               className="glass-card p-6 text-center"
             >
               <div className="font-pixel text-2xl md:text-3xl text-primary text-glow-red mb-2">
-                {s.v}
+                <CountUp to={s.to} suffix={s.suffix} fallback={s.fallback} />
               </div>
               <div className="font-pixel text-[9px] text-muted-foreground tracking-widest">
                 {s.l}
