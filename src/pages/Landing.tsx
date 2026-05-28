@@ -1,8 +1,41 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring, useInView, animate } from "framer-motion";
 import { ArrowRight, Sparkles, Zap, Search, Trophy, QrCode, Palette } from "lucide-react";
 import PixelParticles from "@/components/PixelParticles";
+
+// Animated count-up that triggers when scrolled into view
+const CountUp = ({
+  to,
+  suffix = "",
+  duration = 2,
+  fallback,
+}: {
+  to: number;
+  suffix?: string;
+  duration?: number;
+  fallback?: string;
+}) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const [val, setVal] = useState(0);
+
+  useEffect(() => {
+    if (!inView || fallback) return;
+    const controls = animate(0, to, {
+      duration,
+      ease: "easeOut",
+      onUpdate: (v) => setVal(Math.floor(v)),
+    });
+    return () => controls.stop();
+  }, [inView, to, duration, fallback]);
+
+  return (
+    <span ref={ref}>
+      {fallback ?? `${val.toLocaleString()}${suffix}`}
+    </span>
+  );
+};
 
 // Cinematic parallax showcase — legendary/iconic Pokémon sprites at varied depths
 const SHOWCASE = [
