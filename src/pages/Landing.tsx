@@ -1,8 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, useInView, animate } from "framer-motion";
-import { ArrowRight, Sparkles, Zap, Search, Trophy, QrCode, Palette } from "lucide-react";
+import { ArrowRight, Sparkles, Zap, Search, Trophy, QrCode, Palette, Shuffle } from "lucide-react";
 import PixelParticles from "@/components/PixelParticles";
+import TypeShowcase from "@/components/landing/TypeShowcase";
+import GenerationTimeline from "@/components/landing/GenerationTimeline";
+import TrendingNow from "@/components/landing/TrendingNow";
+import AudioToggle from "@/components/landing/AudioToggle";
+import KonamiEgg from "@/components/landing/KonamiEgg";
+import FooterBadges from "@/components/landing/FooterBadges";
 
 // Animated count-up that triggers when scrolled into view
 const CountUp = ({
@@ -470,6 +476,15 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* TYPE SHOWCASE */}
+      <TypeShowcase />
+
+      {/* GENERATION TIMELINE */}
+      <GenerationTimeline />
+
+      {/* TRENDING NOW */}
+      <TrendingNow />
+
       {/* CTA */}
       <section className="relative z-10 py-32 px-6">
         <motion.div
@@ -483,17 +498,31 @@ const Landing = () => {
           <div className="relative glass-card p-12 md:p-16 text-center overflow-hidden">
             <div className="absolute inset-0 pixel-grid-bg opacity-10" />
             <div className="relative">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                className="w-20 h-20 mx-auto mb-8 relative"
-              >
-                <div className="absolute inset-0 rounded-full border-4 border-primary" />
-                <div className="absolute top-0 left-0 right-0 h-1/2 bg-primary rounded-t-full" />
-                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-muted rounded-b-full" />
-                <div className="absolute top-1/2 left-0 right-0 h-1 bg-background -translate-y-1/2" />
-                <div className="absolute top-1/2 left-1/2 w-6 h-6 bg-background rounded-full -translate-x-1/2 -translate-y-1/2 border-2 border-primary" />
-              </motion.div>
+              {/* Pulsing pokéball */}
+              <div className="relative w-24 h-24 mx-auto mb-8">
+                <motion.span
+                  className="absolute inset-0 rounded-full bg-primary/40"
+                  animate={{ scale: [1, 1.6, 1], opacity: [0.6, 0, 0.6] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                />
+                <motion.span
+                  className="absolute inset-0 rounded-full bg-primary/30"
+                  animate={{ scale: [1, 1.9, 1], opacity: [0.4, 0, 0.4] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.4 }}
+                />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-2 rounded-full"
+                >
+                  <div className="absolute inset-0 rounded-full border-4 border-primary" />
+                  <div className="absolute top-0 left-0 right-0 h-1/2 bg-primary rounded-t-full" />
+                  <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-muted rounded-b-full" />
+                  <div className="absolute top-1/2 left-0 right-0 h-1 bg-background -translate-y-1/2" />
+                  <div className="absolute top-1/2 left-1/2 w-6 h-6 bg-background rounded-full -translate-x-1/2 -translate-y-1/2 border-2 border-primary" />
+                </motion.div>
+              </div>
+
               <h2 className="font-pixel text-xl md:text-3xl mb-4 text-glow-yellow">
                 READY, TRAINER?
               </h2>
@@ -501,25 +530,56 @@ const Landing = () => {
                 Step inside the Pokédex and start your journey through every region,
                 generation, and creature ever known.
               </p>
-              <Link
-                to="/explore"
-                className="inline-flex items-center gap-3 px-10 py-5 rounded-lg bg-primary text-primary-foreground font-pixel text-sm glow-red hover:scale-105 transition-transform"
-              >
-                ENTER POKÉDEX
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                <Link
+                  to="/explore"
+                  className="inline-flex items-center gap-3 px-10 py-5 rounded-lg bg-primary text-primary-foreground font-pixel text-sm glow-red hover:scale-105 transition-transform"
+                >
+                  ENTER POKÉDEX
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+
+                {/* Glitchy secondary CTA */}
+                <Link
+                  to={`/pokemon/${Math.floor(Math.random() * 1000) + 1}`}
+                  className="group relative inline-flex items-center gap-2 px-8 py-5 rounded-lg border border-accent/60 bg-accent/10 backdrop-blur-md font-pixel text-xs overflow-hidden hover:border-accent transition-colors"
+                  data-text="RANDOM ENCOUNTER"
+                >
+                  <Shuffle className="w-4 h-4 text-accent" />
+                  <span className="relative">
+                    <span aria-hidden className="absolute inset-0 text-accent opacity-0 group-hover:opacity-100 animate-[glitch_0.6s_steps(2)_infinite] [transform:translate(2px,-1px)]">
+                      RANDOM ENCOUNTER
+                    </span>
+                    <span aria-hidden className="absolute inset-0 text-primary opacity-0 group-hover:opacity-100 animate-[glitch_0.55s_steps(2)_infinite_reverse] [transform:translate(-2px,1px)]">
+                      RANDOM ENCOUNTER
+                    </span>
+                    <span className="relative">RANDOM ENCOUNTER</span>
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
         </motion.div>
       </section>
+
+      {/* FOOTER BADGES */}
+      <FooterBadges />
 
       <footer className="relative z-10 border-t border-border/40 py-8 text-center">
         <p className="font-pixel text-[8px] text-muted-foreground">
           DATA FROM POKEAPI.CO • NOT AFFILIATED WITH NINTENDO
         </p>
       </footer>
+
+      {/* Floating chiptune toggle */}
+      <AudioToggle />
+
+      {/* Easter egg */}
+      <KonamiEgg />
     </div>
   );
 };
 
 export default Landing;
+

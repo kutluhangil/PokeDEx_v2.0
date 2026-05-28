@@ -115,6 +115,14 @@ export default {
           from: { width: "0%" },
           to: { width: "var(--stat-width)" },
         },
+        "glitch": {
+          "0%": { transform: "translate(0,0)", opacity: "0.9" },
+          "20%": { transform: "translate(-2px,1px)", opacity: "0.7" },
+          "40%": { transform: "translate(2px,-1px)", opacity: "1" },
+          "60%": { transform: "translate(-1px,2px)", opacity: "0.6" },
+          "80%": { transform: "translate(1px,-2px)", opacity: "0.85" },
+          "100%": { transform: "translate(0,0)", opacity: "0.9" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
