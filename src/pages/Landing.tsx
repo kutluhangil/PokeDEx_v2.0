@@ -399,10 +399,10 @@ const Landing = () => {
       <section className="relative z-10 py-24 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { v: "1000+", l: "POKÉMON" },
-            { v: "9", l: "GENERATIONS" },
-            { v: "18", l: "TYPES" },
-            { v: "∞", l: "POSSIBILITIES" },
+            { to: 1000, suffix: "+", l: "POKÉMON" },
+            { to: 9, suffix: "", l: "GENERATIONS" },
+            { to: 18, suffix: "", l: "TYPES" },
+            { to: 0, suffix: "", l: "POSSIBILITIES", fallback: "∞" },
           ].map((s, i) => (
             <motion.div
               key={s.l}
@@ -413,7 +413,7 @@ const Landing = () => {
               className="glass-card p-6 text-center"
             >
               <div className="font-pixel text-2xl md:text-3xl text-primary text-glow-red mb-2">
-                {s.v}
+                <CountUp to={s.to} suffix={s.suffix} fallback={s.fallback} />
               </div>
               <div className="font-pixel text-[9px] text-muted-foreground tracking-widest">
                 {s.l}
