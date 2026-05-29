@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Share2, QrCode, AlertTriangle, Link as LinkIcon } from "lucide-react";
+import { X, Sparkles, Share2, QrCode, AlertTriangle, Link as LinkIcon, ChevronLeft, ChevronRight, Volume2, VolumeX } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { usePokemonDetail } from "@/hooks/usePokemon";
 import { getTypeColor, getTypeGradient } from "@/lib/pokemon";
 import { useSettings } from "@/contexts/SettingsContext";
 import { trackView } from "@/lib/viewTracker";
+import { sfx, setSfxMuted, isSfxMuted } from "@/lib/sfx";
 
 interface PokemonModalProps {
   pokemonId: number | null;
@@ -26,6 +27,9 @@ const STAT_LABELS: Record<string, string> = {
   speed: "SPD",
 };
 
+const MIN_ID = 1;
+const MAX_ID = 1025;
+
 const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch }: PokemonModalProps) => {
   const isInvalid = pokemonId === -1;
   const fetchId = isInvalid ? null : pokemonId;
@@ -33,16 +37,53 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
   const { shiny } = useSettings();
   const location = useLocation();
   const [showQR, setShowQR] = useState(false);
+  const [muted, setMutedState] = useState(isSfxMuted());
+
+  const toggleMute = () => {
+    const next = !muted;
+    setSfxMuted(next);
+    setMutedState(next);
+  };
 
   const buildShareUrl = (id: number) =>
     `${window.location.origin}/pokemon/${id}${location.search}`;
 
+  const goPrev = () => {
+    if (!pokemonId || pokemonId <= MIN_ID || !onNavigate) return;
+    sfx.prev();
+    onNavigate(pokemonId - 1);
+  };
+  const goNext = () => {
+    if (!pokemonId || pokemonId >= MAX_ID || !onNavigate) return;
+    sfx.next();
+    onNavigate(pokemonId + 1);
+  };
+  const handleClose = () => {
+    sfx.close();
+    onClose();
+  };
+
   useEffect(() => {
-    if (pokemonId && !isInvalid) trackView(pokemonId);
+    if (pokemonId && !isInvalid) {
+      trackView(pokemonId);
+      sfx.select();
+    }
   }, [pokemonId, isInvalid]);
 
   useEffect(() => {
     setShowQR(false);
+  }, [pokemonId]);
+
+  useEffect(() => {
+    if (!pokemonId) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goPrev();
+      else if (e.key === "ArrowRight") goNext();
+      else if (e.key === "Escape") handleClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pokemonId]);
 
   return (
