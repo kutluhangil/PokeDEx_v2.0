@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { type PokemonBasic, getTypeColor, getTypeGradient } from "@/lib/pokemon";
@@ -12,10 +13,21 @@ interface PokemonCardProps {
 }
 
 const PokemonCard = ({ pokemon, onClick, variant = "grid", index = 0 }: PokemonCardProps) => {
+  const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+
+  const goToType = (e: React.MouseEvent, type: string) => {
+    e.stopPropagation();
+    navigate(`/explore?types=${type}`);
+    requestAnimationFrame(() => {
+      document
+        .getElementById("collection-section")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!cardRef.current) return;
@@ -130,9 +142,11 @@ const PokemonCard = ({ pokemon, onClick, variant = "grid", index = 0 }: PokemonC
           {/* Types */}
           <div className="flex gap-2 mt-2">
             {pokemon.types.map((type) => (
-              <span
+              <button
                 key={type}
-                className="type-badge"
+                onClick={(e) => goToType(e, type)}
+                title={`Filter by ${type}`}
+                className="type-badge cursor-pointer hover:scale-110 transition-transform"
                 style={{
                   backgroundColor: `hsl(${getTypeColor(type)} / 0.3)`,
                   color: `hsl(${getTypeColor(type)})`,
@@ -140,7 +154,7 @@ const PokemonCard = ({ pokemon, onClick, variant = "grid", index = 0 }: PokemonC
                 }}
               >
                 {type}
-              </span>
+              </button>
             ))}
           </div>
         </div>
