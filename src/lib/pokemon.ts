@@ -19,7 +19,16 @@ export interface PokemonDetail extends PokemonBasic {
   abilities: string[];
   stats: { name: string; value: number }[];
   description: string;
-  evolutionChain: { id: number; name: string; sprite: string }[];
+  evolutionChain: {
+    id: number;
+    name: string;
+    sprite: string;
+    minLevel?: number;
+    triggerName?: string;
+    itemName?: string;
+  }[];
+  cries?: { latest: string; legacy: string };
+  moves: { name: string; level: number; method: string }[];
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -144,25 +153,64 @@ export async function fetchPokemonDetail(id: number): Promise<PokemonDetail> {
   );
 
   // Fetch evolution chain
-  let evolutionChain: { id: number; name: string; sprite: string }[] = [];
+  let evolutionChain: {
+    id: number;
+    name: string;
+    sprite: string;
+    minLevel?: number;
+    triggerName?: string;
+    itemName?: string;
+  }[] = [];
   try {
     const evoRes = await fetch(speciesData.evolution_chain.url);
     const evoData = await evoRes.json();
-    const extractChain = (chain: any) => {
+    const extractChain = (chain: any, details?: any) => {
       const speciesName = chain.species.name;
       const speciesUrl = chain.species.url;
       const speciesId = parseInt(speciesUrl.split("/").filter(Boolean).pop());
+      
+      let minLevel: number | undefined;
+      let triggerName: string | undefined;
+      let itemName: string | undefined;
+
+      if (details && details.length > 0) {
+        const d = details[0];
+        minLevel = d.min_level || undefined;
+        triggerName = d.trigger?.name || undefined;
+        itemName = d.item?.name?.replace("-", " ") || undefined;
+      }
+
       evolutionChain.push({
         id: speciesId,
         name: speciesName,
         sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${speciesId}.png`,
+        minLevel,
+        triggerName,
+        itemName,
       });
+
       if (chain.evolves_to.length > 0) {
-        extractChain(chain.evolves_to[0]);
+        extractChain(chain.evolves_to[0], chain.evolves_to[0].evolution_details);
       }
     };
     extractChain(evoData.chain);
   } catch {}
+
+  const moves = data.moves
+    .map((m: any) => {
+      const details = m.version_group_details[0];
+      return {
+        name: m.move.name.replace("-", " "),
+        level: details?.level_learned_at || 0,
+        method: details?.move_learn_method?.name || "level-up",
+      };
+    })
+    .sort((a: any, b: any) => {
+      if (a.method === "level-up" && b.method !== "level-up") return -1;
+      if (a.method !== "level-up" && b.method === "level-up") return 1;
+      if (a.method === "level-up" && b.method === "level-up") return a.level - b.level;
+      return a.name.localeCompare(b.name);
+    });
 
   const detail: PokemonDetail = {
     id: data.id,
@@ -194,6 +242,8 @@ export async function fetchPokemonDetail(id: number): Promise<PokemonDetail> {
     })),
     description: descEntry?.flavor_text?.replace(/\f/g, " ") || "No description available.",
     evolutionChain,
+    cries: data.cries || undefined,
+    moves,
   };
 
   detailCache.set(id, detail);

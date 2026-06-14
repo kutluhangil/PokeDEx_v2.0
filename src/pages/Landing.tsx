@@ -271,12 +271,20 @@ const Landing = () => {
           <Link to="/" className="font-pixel text-sm text-primary text-glow-red">
             POKEDEX
           </Link>
-          <Link
-            to="/explore"
-            className="font-pixel text-[9px] md:text-[10px] px-4 py-2 rounded-md bg-primary text-primary-foreground hover:scale-105 transition-transform glow-red"
-          >
-            ENTER ▶
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/quiz"
+              className="font-pixel text-[9px] md:text-[10px] px-4 py-2 rounded-md bg-accent/10 border border-accent/40 text-accent hover:bg-accent/25 hover:scale-105 transition-all"
+            >
+              🎮 QUIZ
+            </Link>
+            <Link
+              to="/explore"
+              className="font-pixel text-[9px] md:text-[10px] px-4 py-2 rounded-md bg-primary text-primary-foreground hover:scale-105 transition-transform glow-red"
+            >
+              ENTER ▶
+            </Link>
+          </div>
         </div>
       </header>
 

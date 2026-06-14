@@ -122,29 +122,87 @@
     @apply bg-card/60 backdrop-blur-xl border border-border/50 rounded-xl;
     box-shadow: 0 8px 32px hsl(0 0% 0% / 0.4),
                 inset 0 1px 0 hsl(0 0% 100% / 0.05);
+    transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease;
   }
 
   .glow-red {
     box-shadow: var(--glow-red);
+    transition: box-shadow 0.4s ease;
   }
   .glow-cyan {
     box-shadow: var(--glow-cyan);
+    transition: box-shadow 0.4s ease;
   }
   .glow-yellow {
     box-shadow: var(--glow-yellow);
+    transition: box-shadow 0.4s ease;
   }
   .glow-green {
     box-shadow: var(--glow-green);
+    transition: box-shadow 0.4s ease;
   }
 
   .text-glow-red {
     text-shadow: 0 0 10px hsl(4 100% 60% / 0.6), 0 0 30px hsl(4 100% 60% / 0.3);
+    transition: text-shadow 0.4s ease, color 0.4s ease;
   }
   .text-glow-cyan {
     text-shadow: 0 0 10px hsl(187 100% 50% / 0.6), 0 0 30px hsl(187 100% 50% / 0.3);
+    transition: text-shadow 0.4s ease, color 0.4s ease;
   }
   .text-glow-yellow {
     text-shadow: 0 0 10px hsl(47 100% 52% / 0.6), 0 0 30px hsl(47 100% 52% / 0.3);
+    transition: text-shadow 0.4s ease, color 0.4s ease;
+  }
+
+  .holographic-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    background-image: linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 30%,
+      rgba(255, 0, 0, 0.08) 40%,
+      rgba(255, 255, 0, 0.08) 45%,
+      rgba(0, 255, 255, 0.08) 50%,
+      rgba(0, 0, 255, 0.08) 55%,
+      rgba(255, 0, 255, 0.08) 60%,
+      rgba(255, 255, 255, 0.03) 70%,
+      transparent 100%
+    );
+    background-size: 200% 200%;
+    background-position: var(--mouse-x, 50%) var(--mouse-y, 50%);
+    mix-blend-mode: color-dodge;
+    opacity: 0;
+    transition: opacity 0.3s ease, background-position 0.1s ease;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  .group:hover .holographic-overlay {
+    opacity: 0.35;
+  }
+
+  .holographic-overlay.is-shiny {
+    background-image: linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 20%,
+      rgba(255, 0, 0, 0.18) 35%,
+      rgba(255, 255, 0, 0.18) 43%,
+      rgba(0, 255, 0, 0.18) 50%,
+      rgba(0, 255, 255, 0.18) 57%,
+      rgba(0, 0, 255, 0.18) 65%,
+      rgba(255, 0, 255, 0.18) 75%,
+      rgba(255, 255, 255, 0.06) 85%,
+      transparent 100%
+    );
+    opacity: 0.15; /* subtle glow even when not hovered! */
+  }
+
+  .group:hover .holographic-overlay.is-shiny {
+    opacity: 0.65;
   }
 
   .scanline-overlay {
@@ -215,3 +273,50 @@
   90% { opacity: 1; }
   100% { transform: translateY(100vh); opacity: 0; }
 }
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+/* CRT Screen Effect */
+.crt-screen::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+  z-index: 99999;
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+.crt-screen::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.55) 100%);
+  z-index: 100000;
+  pointer-events: none;
+}
+
+.crt-screen body {
+  animation: crt-flicker 0.2s infinite;
+}
+
+@keyframes crt-flicker {
+  0%, 100% { opacity: 0.99; }
+  50% { opacity: 1; }
+  25% { opacity: 0.985; }
+  75% { opacity: 0.995; }
+}
+

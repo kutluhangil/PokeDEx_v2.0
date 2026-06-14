@@ -9,6 +9,7 @@ import PokemonModal from "@/components/PokemonModal";
 import PixelParticles from "@/components/PixelParticles";
 import SettingsBar from "@/components/SettingsBar";
 import Leaderboard from "@/components/Leaderboard";
+import TeamBuilder from "@/components/TeamBuilder";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -110,6 +111,12 @@ const Index = () => {
                 <span className="font-pixel text-[8px] text-muted-foreground hidden md:inline">
                   {pokemon.length} POKÉMON
                 </span>
+                <button
+                  onClick={() => navigate("/quiz")}
+                  className="font-pixel text-[8px] px-2.5 py-1.5 rounded-lg border border-accent/40 bg-accent/15 text-accent hover:bg-accent/25 transition-all flex items-center gap-1"
+                >
+                  🎮 QUIZ
+                </button>
               </div>
               <SettingsBar onRandom={handleRandom} />
             </div>
@@ -126,6 +133,7 @@ const Index = () => {
               <Leaderboard pokemon={pokemon} onSelect={openPokemon} />
               <SearchSection pokemon={pokemon} onSelect={openPokemon} />
               <CollectionGrid pokemon={pokemon} onSelect={openPokemon} />
+              <TeamBuilder pokemonList={pokemon} />
             </>
           )}
 

@@ -52,10 +52,27 @@ function playTones(tones: Tone[]) {
   });
 }
 
+let activeAudio: HTMLAudioElement | null = null;
+
 export const sfx = {
   select: () => playTones([{ freq: 880, duration: 0.08 }, { freq: 1320, duration: 0.1, delay: 0.05 }]),
   next: () => playTones([{ freq: 660, duration: 0.06 }, { freq: 990, duration: 0.08, delay: 0.04 }]),
   prev: () => playTones([{ freq: 990, duration: 0.06 }, { freq: 660, duration: 0.08, delay: 0.04 }]),
   close: () => playTones([{ freq: 440, duration: 0.08 }, { freq: 220, duration: 0.12, delay: 0.05 }]),
   hover: () => playTones([{ freq: 1500, duration: 0.04, gain: 0.04 }]),
+  correct: () => playTones([{ freq: 523.25, duration: 0.1 }, { freq: 659.25, duration: 0.1, delay: 0.08 }, { freq: 783.99, duration: 0.1, delay: 0.16 }, { freq: 1046.5, duration: 0.25, delay: 0.24 }]),
+  wrong: () => playTones([{ freq: 220, duration: 0.15, type: "sawtooth" }, { freq: 147, duration: 0.35, type: "sawtooth", delay: 0.1 }]),
+  playCry: (url: string) => {
+    if (muted || !url) return;
+    try {
+      if (activeAudio) {
+        activeAudio.pause();
+        activeAudio = null;
+      }
+      const audio = new Audio(url);
+      audio.volume = 0.25;
+      activeAudio = audio;
+      audio.play().catch(() => {});
+    } catch {}
+  },
 };

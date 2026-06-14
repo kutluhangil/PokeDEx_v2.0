@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { type PokemonBasic, getTypeColor, getTypeGradient } from "@/lib/pokemon";
 import { useSettings } from "@/contexts/SettingsContext";
+import { setDynamicTheme, resetDynamicTheme } from "@/lib/dynamicTheme";
 
 interface PokemonCardProps {
   pokemon: PokemonBasic;
@@ -38,12 +39,23 @@ const PokemonCard = ({ pokemon, onClick, variant = "grid", index = 0 }: PokemonC
     const centerY = rect.height / 2;
     setRotateX((y - centerY) / 10 * -1);
     setRotateY((x - centerX) / 10);
+
+    const percentX = (x / rect.width) * 100;
+    const percentY = (y / rect.height) * 100;
+    cardRef.current.style.setProperty("--mouse-x", `${percentX}%`);
+    cardRef.current.style.setProperty("--mouse-y", `${percentY}%`);
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    setDynamicTheme(pokemon.types);
   };
 
   const handleMouseLeave = () => {
     setRotateX(0);
     setRotateY(0);
     setIsHovered(false);
+    resetDynamicTheme();
   };
 
   const { shiny } = useSettings();
@@ -70,7 +82,7 @@ const PokemonCard = ({ pokemon, onClick, variant = "grid", index = 0 }: PokemonC
       }}
       onClick={() => onClick(pokemon.id)}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <motion.div
@@ -98,6 +110,9 @@ const PokemonCard = ({ pokemon, onClick, variant = "grid", index = 0 }: PokemonC
             boxShadow: `inset 0 0 30px hsl(${typeColor} / 0.3), 0 0 30px hsl(${typeColor} / 0.2)`,
           }}
         />
+
+        {/* Holographic reflection overlay */}
+        <div className={`holographic-overlay ${shiny ? "is-shiny" : ""}`} />
 
         {/* Content */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full p-4">
