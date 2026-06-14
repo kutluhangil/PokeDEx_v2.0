@@ -6,6 +6,7 @@ import { usePokemonList } from "@/hooks/usePokemon";
 import { fetchPokemonDetail, type PokemonDetail } from "@/lib/pokemon";
 import { sfx } from "@/lib/sfx";
 import PixelParticles from "@/components/PixelParticles";
+import TypePixelIcon from "@/components/ui/TypePixelIcon";
 
 export default function QuizPage() {
   const navigate = useNavigate();
@@ -200,13 +201,14 @@ export default function QuizPage() {
                         <h2 className="font-pixel text-sm text-foreground capitalize text-glow-yellow">
                           {targetPokemon.name}
                         </h2>
-                        <div className="flex gap-1 justify-center">
+                        <div className="flex gap-1.5 justify-center">
                           {targetPokemon.types.map((t) => (
                             <span
                               key={t}
-                              className="font-pixel text-[5px] px-1.5 py-0.5 rounded border border-border bg-muted/40 capitalize text-muted-foreground"
+                              className="font-pixel text-[5px] px-1.5 py-0.5 rounded border border-border bg-muted/40 capitalize text-muted-foreground flex items-center gap-1"
                             >
-                              {t}
+                              <TypePixelIcon type={t} className="w-2 h-2" glow={false} />
+                              <span>{t}</span>
                             </span>
                           ))}
                         </div>

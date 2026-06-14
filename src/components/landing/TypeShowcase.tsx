@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { getTypeColor } from "@/lib/pokemon";
+import TypePixelIcon from "../ui/TypePixelIcon";
 
 const TYPES = [
   "normal","fire","water","electric","grass","ice","fighting","poison","ground",
@@ -22,7 +23,7 @@ const TypeShowcase = () => {
             Tap any element to filter the Pokédex by that type instantly.
           </p>
         </motion.div>
-
+        
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-3 md:gap-4">
           {TYPES.map((t, i) => {
             const c = getTypeColor(t);
@@ -49,12 +50,12 @@ const TypeShowcase = () => {
                     className="absolute -inset-1 rounded-xl opacity-0 group-hover:opacity-80 blur-xl transition-opacity -z-10"
                     style={{ background: `hsl(${c} / 0.6)` }}
                   />
-                  <span
-                    className="w-7 h-7 md:w-9 md:h-9 rounded-full mb-2 border-2 transition-transform group-hover:scale-110"
+                  <TypePixelIcon
+                    type={t}
+                    className="w-7 h-7 md:w-9 md:h-9 mb-2 transition-transform group-hover:scale-110"
                     style={{
-                      background: `linear-gradient(135deg, hsl(${c}) 0%, hsl(${c} / 0.5) 100%)`,
-                      borderColor: `hsl(${c})`,
-                      boxShadow: `0 0 18px hsl(${c} / 0.6)`,
+                      color: `hsl(${c})`,
+                      filter: `drop-shadow(0 0 8px hsl(${c} / 0.7))`
                     }}
                   />
                   <span className="font-pixel text-[8px] md:text-[9px] tracking-widest text-foreground/80 group-hover:text-foreground uppercase relative">

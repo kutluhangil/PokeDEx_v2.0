@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { type PokemonBasic, getTypeColor, getTypeGradient } from "@/lib/pokemon";
+import TypePixelIcon from "@/components/ui/TypePixelIcon";
 import { useSettings } from "@/contexts/SettingsContext";
 import { setDynamicTheme, resetDynamicTheme } from "@/lib/dynamicTheme";
 
@@ -161,14 +162,15 @@ const PokemonCard = ({ pokemon, onClick, variant = "grid", index = 0 }: PokemonC
                 key={type}
                 onClick={(e) => goToType(e, type)}
                 title={`Filter by ${type}`}
-                className="type-badge cursor-pointer hover:scale-110 transition-transform"
+                className="type-badge cursor-pointer hover:scale-110 transition-transform flex items-center gap-1.5"
                 style={{
                   backgroundColor: `hsl(${getTypeColor(type)} / 0.3)`,
                   color: `hsl(${getTypeColor(type)})`,
                   border: `1px solid hsl(${getTypeColor(type)} / 0.5)`,
                 }}
               >
-                {type}
+                <TypePixelIcon type={type} className="w-2.5 h-2.5" glow={false} />
+                <span className="capitalize">{type}</span>
               </button>
             ))}
           </div>

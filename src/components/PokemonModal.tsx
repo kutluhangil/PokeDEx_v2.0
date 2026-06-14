@@ -13,6 +13,7 @@ import { sfx, setSfxMuted, isSfxMuted } from "@/lib/sfx";
 import { setDynamicTheme, resetDynamicTheme } from "@/lib/dynamicTheme";
 import { useTeam } from "@/contexts/TeamContext";
 import { getDefensiveMultipliers } from "@/lib/typeMatchup";
+import TypePixelIcon from "./ui/TypePixelIcon";
 
 interface PokemonModalProps {
   pokemonId: number | null;
@@ -366,14 +367,15 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                           {pokemon.types.map((type) => (
                             <span
                               key={type}
-                              className="type-badge text-[8px] px-2 py-0.5"
+                              className="type-badge text-[8px] px-2 py-0.5 flex items-center gap-1"
                               style={{
                                 backgroundColor: `hsl(${getTypeColor(type)} / 0.25)`,
                                 color: `hsl(${getTypeColor(type)})`,
                                 border: `1px solid hsl(${getTypeColor(type)} / 0.4)`,
                               }}
                             >
-                              {type}
+                              <TypePixelIcon type={type} className="w-2 h-2" glow={false} />
+                              <span className="capitalize">{type}</span>
                             </span>
                           ))}
                         </div>
@@ -415,14 +417,15 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                                 {comparePokemon.types.map((type) => (
                                   <span
                                     key={type}
-                                    className="type-badge text-[8px] px-2 py-0.5"
+                                    className="type-badge text-[8px] px-2 py-0.5 flex items-center gap-1"
                                     style={{
                                       backgroundColor: `hsl(${getTypeColor(type)} / 0.25)`,
                                       color: `hsl(${getTypeColor(type)})`,
                                       border: `1px solid hsl(${getTypeColor(type)} / 0.4)`,
                                     }}
                                   >
-                                    {type}
+                                    <TypePixelIcon type={type} className="w-2 h-2" glow={false} />
+                                    <span className="capitalize">{type}</span>
                                   </span>
                                 ))}
                               </div>
@@ -780,14 +783,15 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                         {pokemon.types.map((type) => (
                           <span
                             key={type}
-                            className="type-badge text-[10px] px-4 py-1.5"
+                            className="type-badge text-[10px] px-4 py-1.5 flex items-center gap-1.5"
                             style={{
                               backgroundColor: `hsl(${getTypeColor(type)} / 0.25)`,
                               color: `hsl(${getTypeColor(type)})`,
                               border: `1px solid hsl(${getTypeColor(type)} / 0.4)`,
                             }}
                           >
-                            {type}
+                            <TypePixelIcon type={type} className="w-2.5 h-2.5" glow={false} />
+                            <span className="capitalize">{type}</span>
                           </span>
                         ))}
                         
