@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles, Share2, QrCode, AlertTriangle, Link as LinkIcon, ChevronLeft, ChevronRight, Volume2, VolumeX, GitCompare, Scale } from "lucide-react";
 import QRCode from "react-qr-code";
