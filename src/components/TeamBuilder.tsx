@@ -140,7 +140,7 @@ export default function TeamBuilder({ pokemonList }: TeamBuilderProps) {
                             >
                               <button
                                 onClick={() => removeFromTeam(p.id)}
-                                className="absolute top-1.5 right-1.5 p-1 rounded-md bg-destructive/10 hover:bg-destructive text-destructive hover:text-destructive-foreground transition-all opacity-0 group-hover:opacity-100"
+                                className="absolute top-1 right-1 p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md bg-destructive/10 hover:bg-destructive text-destructive hover:text-destructive-foreground transition-all sm:opacity-0 group-hover:opacity-100"
                                 title="Remove member"
                               >
                                 <Trash2 className="w-3 h-3" />
@@ -255,14 +255,14 @@ export default function TeamBuilder({ pokemonList }: TeamBuilderProps) {
                       <div className="flex gap-2">
                         <button
                           onClick={handleCopyLink}
-                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary text-primary-foreground font-pixel text-[7px] rounded-lg hover:scale-[1.02] transition-transform"
+                          className="flex-1 flex items-center justify-center gap-1.5 px-3 min-h-[44px] bg-primary text-primary-foreground font-pixel text-[7px] rounded-lg hover:scale-[1.02] transition-transform"
                         >
                           <Share2 className="w-3.5 h-3.5" />
                           <span>SHARE LINK</span>
                         </button>
                         <button
                           onClick={() => setShowQR(!showQR)}
-                          className={`px-3 py-2 rounded-lg border font-pixel text-[7px] flex items-center justify-center gap-1.5 transition-colors ${
+                          className={`px-3 min-h-[44px] rounded-lg border font-pixel text-[7px] flex items-center justify-center gap-1.5 transition-colors ${
                             showQR ? "bg-accent/20 border-accent/60 text-accent" : "bg-muted/30 border-border text-foreground hover:bg-muted"
                           }`}
                         >
@@ -272,7 +272,7 @@ export default function TeamBuilder({ pokemonList }: TeamBuilderProps) {
                         <button
                           onClick={clearTeam}
                           title="Clear whole team"
-                          className="px-3 py-2 rounded-lg bg-destructive/10 border border-destructive/30 hover:bg-destructive/20 text-destructive"
+                          className="px-3 min-h-[44px] flex items-center justify-center rounded-lg bg-destructive/10 border border-destructive/30 hover:bg-destructive/20 text-destructive"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>

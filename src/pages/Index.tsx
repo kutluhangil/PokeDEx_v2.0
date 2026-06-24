@@ -21,12 +21,7 @@ const Index = () => {
     : null;
 
   const { data: pokemon = [], isLoading } = useAllPokemon();
-  // Skip intro if user is landing on a deep link
-  const [introComplete, setIntroComplete] = useState(!!id);
-
-  useEffect(() => {
-    if (id && !introComplete) setIntroComplete(true);
-  }, [id, introComplete]);
+  const [introComplete, setIntroComplete] = useState(true);
 
 
   // Persist scroll position when opening/closing the modal
@@ -100,25 +95,37 @@ const Index = () => {
         <main className="relative z-10">
           {/* Header */}
           <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50">
-            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <h1
-                  className="font-pixel text-sm text-primary text-glow-red cursor-pointer"
-                  onClick={() => navigate("/explore")}
-                >
-                  POKEDEX
-                </h1>
-                <span className="font-pixel text-[8px] text-muted-foreground hidden md:inline">
-                  {pokemon.length} POKÉMON
-                </span>
+            <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+              <div className="flex items-center justify-between w-full md:w-auto gap-3">
+                <div className="flex items-center gap-3">
+                  <h1
+                    className="font-pixel text-sm text-primary text-glow-red cursor-pointer"
+                    onClick={() => navigate("/explore")}
+                  >
+                    POKEDEX
+                  </h1>
+                  <span className="font-pixel text-[8px] text-muted-foreground hidden lg:inline">
+                    {pokemon.length} POKÉMON
+                  </span>
+                </div>
                 <button
                   onClick={() => navigate("/quiz")}
-                  className="font-pixel text-[8px] px-2.5 py-1.5 rounded-lg border border-accent/40 bg-accent/15 text-accent hover:bg-accent/25 transition-all flex items-center gap-1"
+                  className="font-pixel text-[8px] px-2.5 py-1.5 rounded-lg border border-accent/40 bg-accent/15 text-accent hover:bg-accent/25 transition-all flex items-center gap-1 md:hidden"
                 >
                   🎮 QUIZ
                 </button>
+                <div className="hidden md:block">
+                  <button
+                    onClick={() => navigate("/quiz")}
+                    className="font-pixel text-[8px] px-2.5 py-1.5 rounded-lg border border-accent/40 bg-accent/15 text-accent hover:bg-accent/25 transition-all flex items-center gap-1"
+                  >
+                    🎮 QUIZ
+                  </button>
+                </div>
               </div>
-              <SettingsBar onRandom={handleRandom} />
+              <div className="w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                <SettingsBar onRandom={handleRandom} />
+              </div>
             </div>
           </header>
 

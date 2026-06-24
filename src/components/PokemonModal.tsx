@@ -14,6 +14,7 @@ import { setDynamicTheme, resetDynamicTheme } from "@/lib/dynamicTheme";
 import { useTeam } from "@/contexts/TeamContext";
 import { getDefensiveMultipliers } from "@/lib/typeMatchup";
 import TypePixelIcon from "./ui/TypePixelIcon";
+import { useTranslation } from "react-i18next";
 
 interface PokemonModalProps {
   pokemonId: number | null;
@@ -36,6 +37,7 @@ const MIN_ID = 1;
 const MAX_ID = 1025;
 
 const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch }: PokemonModalProps) => {
+  const { t } = useTranslation();
   const isInvalid = pokemonId === -1;
   const fetchId = isInvalid ? null : pokemonId;
   const { data: pokemon, isLoading } = usePokemonDetail(fetchId);
@@ -225,18 +227,18 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                 )}
 
                 {/* Action buttons */}
-                <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+                <div className="absolute top-4 right-4 z-20 flex flex-wrap justify-end items-center gap-1.5 sm:gap-2 max-w-[60%] sm:max-w-none">
                   <button
                     onClick={toggleMute}
                     title={muted ? "Unmute SFX" : "Mute SFX"}
-                    className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
+                    className="p-2 sm:p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
                   >
                     {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                   </button>
                   <button
                     onClick={() => setShowQR((v) => !v)}
                     title="Show QR code"
-                    className={`p-2 rounded-lg transition-colors text-foreground ${
+                    className={`p-2 sm:p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-colors text-foreground ${
                       showQR ? "bg-primary/30" : "bg-muted/50 hover:bg-muted"
                     }`}
                   >
@@ -253,7 +255,7 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                       }
                     }}
                     title="Copy link"
-                    className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
+                    className="p-2 sm:p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
                   >
                     <LinkIcon className="w-5 h-5" />
                   </button>
@@ -284,7 +286,7 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                       }
                     }}
                     title="Share link"
-                    className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
+                    className="p-2 sm:p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
                   >
                     <Share2 className="w-5 h-5" />
                   </button>
@@ -294,7 +296,7 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                       !muted && sfx.select();
                     }}
                     title={compareMode ? "Show details" : "Compare Pokémon"}
-                    className={`p-2 rounded-lg transition-colors text-foreground ${
+                    className={`p-2 sm:p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-colors text-foreground ${
                       compareMode ? "bg-primary/30" : "bg-muted/50 hover:bg-muted"
                     }`}
                   >
@@ -303,7 +305,7 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                   <button
                     onClick={handleClose}
                     title="Close (Esc)"
-                    className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
+                    className="p-2 sm:p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-muted/50 hover:bg-muted transition-colors text-foreground"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -665,7 +667,7 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                       {pokemon.evolutionChain.length > 1 && (
                         <div className="mt-6 w-full">
                           <h4 className="font-pixel text-[10px] text-muted-foreground mb-3 text-center">
-                            EVOLUTION MAP
+                            {t("modal.evolution")}
                           </h4>
                           <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap">
                             {pokemon.evolutionChain.map((evo, i) => (
@@ -811,7 +813,7 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                               : "bg-pixel-green/20 border-pixel-green/50 text-pixel-green hover:bg-pixel-green/30"
                           }`}
                         >
-                          {isAdded(pokemon.id) ? "REMOVE FROM TEAM ✕" : "ADD TO TEAM +"}
+                          {isAdded(pokemon.id) ? t("modal.remove_team") : t("modal.add_team")}
                         </button>
                       </div>
 
@@ -828,7 +830,7 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                               : "border-transparent text-muted-foreground hover:text-foreground"
                           }`}
                         >
-                          STATS & INFO
+                          {t("modal.stats_info")}
                         </button>
                         <button
                           onClick={() => {
@@ -841,7 +843,7 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                               : "border-transparent text-muted-foreground hover:text-foreground"
                           }`}
                         >
-                          MOVE SET ({pokemon.moves.length})
+                          {t("modal.move_set", { count: pokemon.moves.length })}
                         </button>
                       </div>
 
@@ -855,18 +857,18 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                           {/* Physical */}
                           <div className="grid grid-cols-2 gap-4">
                             <div className="bg-muted/30 rounded-lg p-3">
-                              <span className="font-pixel text-[8px] text-muted-foreground block">HEIGHT</span>
+                              <span className="font-pixel text-[8px] text-muted-foreground block">{t("modal.height")}</span>
                               <span className="font-body text-sm text-foreground">{pokemon.height / 10} m</span>
                             </div>
                             <div className="bg-muted/30 rounded-lg p-3">
-                              <span className="font-pixel text-[8px] text-muted-foreground block">WEIGHT</span>
+                              <span className="font-pixel text-[8px] text-muted-foreground block">{t("modal.weight")}</span>
                               <span className="font-body text-sm text-foreground">{pokemon.weight / 10} kg</span>
                             </div>
                           </div>
 
                           {/* Abilities */}
                           <div>
-                            <h4 className="font-pixel text-[10px] text-muted-foreground mb-2">ABILITIES</h4>
+                            <h4 className="font-pixel text-[10px] text-muted-foreground mb-2">{t("modal.abilities")}</h4>
                             <div className="flex flex-wrap gap-2">
                               {pokemon.abilities.map((ability) => (
                                 <span
@@ -881,7 +883,7 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
 
                           {/* Stats */}
                           <div>
-                            <h4 className="font-pixel text-[10px] text-muted-foreground mb-3">BASE STATS</h4>
+                            <h4 className="font-pixel text-[10px] text-muted-foreground mb-3">{t("modal.base_stats")}</h4>
                             <div className="space-y-2">
                               {pokemon.stats.map((stat) => (
                                 <div key={stat.name} className="flex items-center gap-3">
@@ -912,9 +914,9 @@ const PokemonModal = ({ pokemonId, invalidId, onClose, onNavigate, onGoToSearch 
                         /* Moves Tab */
                         <div className="space-y-4">
                           <div className="font-pixel text-[7px] text-muted-foreground grid grid-cols-3 border-b border-border/30 pb-2 px-1">
-                            <span>MOVE</span>
-                            <span className="text-center">METHOD</span>
-                            <span className="text-right">LEVEL</span>
+                            <span>{t("modal.move")}</span>
+                            <span className="text-center">{t("modal.method")}</span>
+                            <span className="text-right">{t("modal.level")}</span>
                           </div>
                           <div className="max-h-[280px] overflow-y-auto pr-1 space-y-1.5 scrollbar-thin">
                             {pokemon.moves.map((move, i) => (

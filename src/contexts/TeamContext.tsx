@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { toast } from "sonner";
+import { useAuth } from "./AuthContext";
+import { db } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 interface TeamContextValue {
   teamIds: number[];
@@ -12,9 +15,9 @@ interface TeamContextValue {
 const TeamContext = createContext<TeamContextValue | undefined>(undefined);
 
 export const TeamProvider = ({ children }: { children: ReactNode }) => {
+  const { user } = useAuth();
   const [teamIds, setTeamIds] = useState<number[]>(() => {
     try {
-      // Check if team is deep-linked first
       const params = new URLSearchParams(window.location.search);
       const teamParam = params.get("team");
       if (teamParam) {
@@ -22,9 +25,7 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
           .split(",")
           .map((id) => parseInt(id, 10))
           .filter((id) => !isNaN(id) && id > 0 && id <= 1025);
-        if (ids.length > 0) {
-          return ids.slice(0, 6);
-        }
+        if (ids.length > 0) return ids.slice(0, 6);
       }
       return JSON.parse(localStorage.getItem("pokedex-team") || "[]");
     } catch {
@@ -32,9 +33,38 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
     }
   });
 
+  // Load from Firebase on login
+  useEffect(() => {
+    if (user) {
+      const loadUserTeam = async () => {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists() && docSnap.data().teamIds) {
+            setTeamIds(docSnap.data().teamIds);
+          }
+        } catch (e) {
+          console.error("Error loading team from cloud", e);
+        }
+      };
+      loadUserTeam();
+    }
+  }, [user]);
+
+  // Save to Firebase and LocalStorage
   useEffect(() => {
     localStorage.setItem("pokedex-team", JSON.stringify(teamIds));
-  }, [teamIds]);
+    if (user) {
+      const saveUserTeam = async () => {
+        try {
+          await setDoc(doc(db, "users", user.uid), { teamIds }, { merge: true });
+        } catch (e) {
+          console.error("Error saving team to cloud", e);
+        }
+      };
+      saveUserTeam();
+    }
+  }, [teamIds, user]);
 
   const isAdded = (id: number) => teamIds.includes(id);
 
